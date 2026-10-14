@@ -20,6 +20,7 @@
 """
 import csv
 import os
+import platform
 import plistlib
 import re
 import shutil
@@ -270,6 +271,9 @@ def self_test(app: Path):
 
 
 def main():
+    if sys.platform != "darwin" or platform.machine() != "arm64":
+        sys.exit("독립 앱 번들은 Apple Silicon Mac에서만 만듭니다. Windows는 README의 'Windows' 설치 안내대로 "
+                 "소스에서 실행하세요 (python app.py)")
     if sys.version_info[:2] != (3, 12):
         sys.exit(".venv/bin/python으로 실행하세요 (Python 3.12 패키지를 번들에 복사합니다)")
     site = Path(sysconfig.get_path("purelib"))

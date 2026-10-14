@@ -25,6 +25,11 @@ os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
 from pipeline import params as P  # noqa: E402
 from pipeline import files as files_mod  # noqa: E402
 
+# Windows 콘솔·파이프의 기본 인코딩(cp949 등)에서도 한글·기호 로그가 깨지거나 멈추지 않도록
+for _s in (sys.stdout, sys.stderr):
+    if hasattr(_s, "reconfigure"):
+        _s.reconfigure(encoding="utf-8", errors="replace")
+
 DATA = P.DATA  # 작업 데이터 폴더 (소스로 실행하면 이 폴더)
 PREVIEW_DIR = DATA / "previews"
 

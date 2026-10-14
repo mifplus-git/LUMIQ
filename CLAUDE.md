@@ -7,6 +7,7 @@ LUMIQ — 빛을 이해하고, 사진을 완성하다. (LUMI = 빛과 이미지�
 스크립트와 앱에 API나 LLM 호출을 넣지 않는다.
 
 - 실행: 항상 `.venv/bin/python main.py ...` (Python 3.12 arm64 venv, MPS 사용)
+  - Windows에서는 `.venv/Scripts/python.exe main.py ...`. 설치 확인은 `tools/smoke_test.py` (README의 'OS별 설치')
 - 앱: 응용 프로그램의 `LUMIQ Studio` (`/Applications/LUMIQ Studio.app`) 또는 `.venv/bin/python app.py [폴더]`
   - 앱은 Python·패키지·코드·모델·exiftool을 모두 담은 **독립 번들**이라 이 폴더나 `.venv`, Homebrew 없이도 실행된다.
     작업 데이터(`previews/`·`.app_state.json`·저장한 프리셋)는 이 프로젝트 폴더를 그대로 쓴다 (없으면 앱이 만듦).
@@ -252,9 +253,10 @@ LUMIQ — 빛을 이해하고, 사진을 완성하다. (LUMI = 빛과 이미지�
 main.py              CLI 진입점
 app.py               데스크톱 앱 진입점 (PySide6)
 tools/make_luts.py   luts/*.cube 생성 (film.cube 제외)
-tools/build_app.py   독립 앱 번들을 /Applications에 설치 (코드·패키지를 고쳤거나 프로젝트 폴더를 옮기면 다시 실행)
+tools/build_app.py   독립 앱 번들을 /Applications에 설치 (macOS 전용. 코드·패키지를 고쳤거나 프로젝트 폴더를 옮기면 다시 실행)
+tools/smoke_test.py  설치 확인: 테스트 사진으로 CLI와 앱 창을 실제로 돌려 본다 (Mac·Windows)
 gui/                 앱 화면: window, widgets(슬라이더·크롭·비교선), engine(단계별 캐시 렌더), workers,
-                     assistant(AI 패널 → claude -p), theme(색·아이콘), icon
+                     assistant(AI 패널 → claude -p), theme(색·아이콘), icon, native(OS별 단축키 표기·파일 관리자)
 .app_state.json      앱이 지금 보는 사진·선택 (Claude Code용, 앱이 자동으로 씀)
 lumiq                앱 번들 안 CLI로 가는 링크 (AI 패널이 만듦, = main.py)
 pipeline/            decode, lens, geometry, tone, skin, lut, detail, export, params, runner, files

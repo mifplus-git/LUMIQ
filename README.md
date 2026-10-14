@@ -13,10 +13,10 @@ LUMIQ는 AI로 사진의 빛과 색상, 노출과 디테일을 분석해 사진�
 
 브랜드 소개 전체: [LUMIQ 브랜드 아이덴티티](ref/brand-identity.md)
 
-**LUMIQ Studio**는 니콘 Z6 RAW(NEF)와 JPG·HEIC·PNG·WebP·TIFF 사진을 보정해 JPEG로 내보내는 macOS용 사진 보정 도구입니다.
-데스크톱 앱과 명령줄(CLI) 두 가지로 쓸 수 있습니다.
+**LUMIQ Studio**는 니콘 Z6 RAW(NEF)와 JPG·HEIC·PNG·WebP·TIFF 사진을 보정해 JPEG로 내보내는 사진 보정 도구입니다.
+데스크톱 앱과 명령줄(CLI) 두 가지로 쓸 수 있고, Apple Silicon(M 칩) Mac과 Windows에서 실행됩니다.
 
-보정 연산은 모두 Mac에서 로컬로 처리합니다. [Claude Code](https://claude.com/claude-code)와 함께 쓰면 Claude가 사진을 분석해
+보정 연산은 모두 내 컴퓨터에서 로컬로 처리합니다. [Claude Code](https://claude.com/claude-code)와 함께 쓰면 Claude가 사진을 분석해
 보정값을 정하고, 대화로 다시 조정할 수 있습니다. 코드에는 API 키나 LLM 호출이 들어 있지 않습니다.
 
 ## 주요 기능
@@ -26,33 +26,74 @@ LUMIQ는 AI로 사진의 빛과 색상, 노출과 디테일을 분석해 사진�
 - **원클릭 자동 보정**: 노출·화이트밸런스·톤을 맞추고, 얼굴이 있으면 얼굴 노출을 우선합니다
 - **카메라 톤 맞추기**: RAW 안의 카메라 JPEG(니콘 액티브 D-라이팅·픽처 컨트롤)에 밝기·채도를 맞춥니다
 - **피부 보정**: 얼굴 피부만 밝기·매끈함·채도·따뜻함 조절 (MediaPipe 얼굴 검출, 눈·입술 제외)
-- **AI 노이즈 제거**: SCUNet, Apple Silicon GPU(MPS) 사용
+- **AI 노이즈 제거**: SCUNet (Mac은 GPU(MPS), Windows는 CPU)
 - **프리셋 15종**: 인물·스냅과 계절·장소 13종(벚꽃, 바다, 야경, 단풍, 설경 등). 라이트룸 `.xmp` 프리셋 가져오기
 - **LUT 12종**: 필름, 시네마 틸·오렌지, 골든아워, 파스텔 블룸, 흑백 필름 등
 - **기하 보정**: 렌즈 보정(lensfun), 자동 수평, 크롭(3:2·4:5·1:1·16:9·자유), 회전·반전
 - **정리**: 별점, 별점 필터, 위치(GPS) 추가, 원본 EXIF 유지
 - **원본은 절대 바꾸지 않습니다.** 보정값은 사진 옆 `<사진 파일 이름>.lumiq.json`에 저장됩니다
 
-## 요구 사항
+## 지원 환경
 
-- macOS 13 이상, Apple Silicon (arm64)
-- Python 3.12 (arm64)
-- Homebrew: `exiftool`(EXIF·위치 기록), `lensfun`(렌즈 보정)
-- 선택: Claude Code (앱의 AI 어시스턴트, 대화형 보정)
+| | Mac (Apple Silicon, M 칩) | Windows 10·11 (64비트) |
+| --- | --- | --- |
+| 앱·CLI | ✅ | ✅ |
+| 독립 앱 만들기 | ✅ `LUMIQ Studio.app` | — (소스에서 실행, 바로가기로 띄움) |
+| AI 노이즈 제거 | GPU (MPS) | CPU (느림) |
+| 파일 위치 보기 | Finder | 파일 탐색기 |
 
-## 설치
+- Python 3.12와 exiftool이 필요합니다. exiftool이 없어도 실행은 되지만 EXIF·위치 기록과 렌즈 보정이 빠집니다.
+- 선택: [Claude Code](https://claude.com/claude-code) (앱의 AI 어시스턴트, 대화형 보정)
+- Intel Mac과 Linux는 지원하지 않습니다 (Intel Mac은 PyTorch가 새 버전을 내지 않음).
+- 화면 글자는 한국어입니다. 단축키는 OS에 맞게 바뀝니다 (Mac의 ⌘ = Windows의 Ctrl).
+
+## OS별 설치
+
+### Mac (Apple Silicon, M 칩)
 
 ```bash
+brew install python@3.12 exiftool
 git clone https://github.com/mifplus-git/LUMIQ.git
 cd LUMIQ
-brew install python@3.12 exiftool lensfun
 /opt/homebrew/bin/python3.12 -m venv .venv
 .venv/bin/pip install -r requirements.txt
+.venv/bin/python app.py
 ```
+
+**독립 앱 만들기**: Python·패키지·코드·모델·exiftool을 모두 담은 `LUMIQ Studio.app`을 만듭니다.
+이 폴더나 Homebrew 없이도 실행되고, 코드를 고친 뒤에는 다시 만들어야 앱에 반영됩니다.
+Xcode 명령줄 도구가 필요합니다 (`xcode-select --install`).
+
+```bash
+.venv/bin/python tools/build_app.py                 # /Applications에 설치
+.venv/bin/python tools/build_app.py ~/Applications  # 다른 폴더에
+```
+
+### Windows
+
+PowerShell에서 실행합니다.
+
+```powershell
+winget install Python.Python.3.12
+winget install OliverBetz.ExifTool
+# 설치한 뒤 PowerShell을 새로 열어야 PATH가 반영됩니다
+git clone https://github.com/mifplus-git/LUMIQ.git
+cd LUMIQ
+py -3.12 -m venv .venv
+.venv\Scripts\pip install -r requirements.txt
+.venv\Scripts\python app.py
+```
+
+- 콘솔 창 없이 띄우려면 `.venv\Scripts\pythonw app.py`를 씁니다.
+- 바탕 화면 바로가기: 대상은 `<LUMIQ 폴더>\.venv\Scripts\pythonw.exe app.py`, 시작 위치는 `<LUMIQ 폴더>`로 지정합니다.
+- 아래 예시의 `.venv/bin/python`은 Windows에서 `.venv\Scripts\python`입니다.
+
+### 모델 가중치 (Mac·Windows 공통)
 
 모델 가중치는 용량 때문에 저장소에 들어 있지 않습니다. `models/`에 내려받으세요.
 
 ```bash
+# Mac (터미널)
 mkdir -p models
 curl -L -o models/scunet_color_real_psnr.pth \
   https://github.com/cszn/KAIR/releases/download/v1.0/scunet_color_real_psnr.pth
@@ -60,7 +101,23 @@ curl -L -o models/face_landmarker.task \
   https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task
 ```
 
+```powershell
+# Windows (PowerShell)
+mkdir models
+curl.exe -L -o models/scunet_color_real_psnr.pth https://github.com/cszn/KAIR/releases/download/v1.0/scunet_color_real_psnr.pth
+curl.exe -L -o models/face_landmarker.task https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task
+```
+
 모델이 없어도 실행은 됩니다. 다만 AI 노이즈 제거와 얼굴 검출이 더 단순한 OpenCV 방식으로 대체됩니다.
+
+### 설치 확인 (Mac·Windows 공통)
+
+```bash
+.venv/bin/python tools/smoke_test.py      # Windows: .venv\Scripts\python tools\smoke_test.py
+```
+
+임시 폴더에 테스트 사진을 만들어 패키지, CLI(정보·미리보기·자동 보정·내보내기), 앱 창(화면에 띄우지 않음)을 차례로 확인합니다.
+모두 ✓이면 설치가 끝난 것입니다.
 
 ## 앱
 
@@ -69,28 +126,22 @@ curl -L -o models/face_landmarker.task \
 .venv/bin/python app.py ~/Photos/0901
 ```
 
-독립 앱으로 설치하려면 아래를 실행합니다. Python·패키지·코드·모델·exiftool을 모두 담은
-`/Applications/LUMIQ Studio.app`이 만들어지고, 이 폴더나 Homebrew 없이도 실행됩니다.
-코드를 고친 뒤에는 다시 실행해야 앱에 반영됩니다.
-
-```bash
-.venv/bin/python tools/build_app.py
-```
-
 기본은 **보기 모드**(그리드 / 한 장)이고, **E**를 누르면 보정 패널이 있는 편집 화면으로 바뀝니다.
 
-| 키 | 동작 |
-| --- | --- |
-| ⌘O | 폴더 열기 (폴더·사진을 창에 끌어다 놓아도 됨) |
-| G / E | 그리드 보기 / 편집 · 완료 |
-| ← → | 이전 · 다음 사진 |
-| 1 2 3 / 0 | 별점 매기기 / 지우기 |
-| R | 자르기·회전 |
-| \\ | 보정 전·후 비교 |
-| ⇧⌘C / ⇧⌘V | 설정 복사 / 선택한 사진에 붙여넣기 |
-| ⌘K | AI 어시스턴트 |
-| ⌘E | 내보내기 |
-| ⌘? | 사용법 · 전체 단축키 |
+| 동작 | Mac | Windows |
+| --- | --- | --- |
+| 폴더 열기 (폴더·사진을 창에 끌어다 놓아도 됨) | ⌘O | Ctrl+O |
+| 그리드 보기 / 편집 · 완료 | G / E | G / E |
+| 이전 · 다음 사진 | ← → | ← → |
+| 별점 매기기 / 지우기 | 1 2 3 / 0 | 1 2 3 / 0 |
+| 자르기·회전 | R | R |
+| 보정 전·후 비교 | \\ | \\ |
+| 설정 복사 / 선택한 사진에 붙여넣기 | ⇧⌘C / ⇧⌘V | Ctrl+Shift+C / Ctrl+Shift+V |
+| AI 어시스턴트 | ⌘K | Ctrl+K |
+| 내보내기 | ⌘E | Ctrl+E |
+| 휴지통으로 이동 | ⌘⌫ | Delete |
+| 설정 | ⌘, | Ctrl+, |
+| 사용법 · 전체 단축키 | ⌘? | F1 |
 
 ## CLI
 
@@ -136,8 +187,8 @@ curl -L -o models/face_landmarker.task \
 - 이 폴더에서 Claude Code를 열면 [CLAUDE.md](CLAUDE.md)의 규칙에 따라 작업합니다.
   `--info`로 사진 확인 → `.lumiq.json` 작성 → `--preview`로 미리보기 → 확인 후 재조정 → 내보내기 순서입니다.
   예: "DSC_1236 좀 어둡고 피부가 칙칙해", "0901 폴더 인물 프리셋으로 정리해줘"
-- 앱의 **AI 어시스턴트**(⌘K)는 Mac에 설치된 `claude`를 `claude -p`로 실행합니다.
-  - 각자 Mac에 로그인된 Claude Code를 그대로 쓰므로 API 키가 필요 없고, 계정 정보는 앱이나 저장소에 저장되지 않습니다.
+- 앱의 **AI 어시스턴트**(⌘K · Ctrl+K)는 컴퓨터에 설치된 `claude`를 `claude -p`로 실행합니다.
+  - 각자 컴퓨터에 로그인된 Claude Code를 그대로 쓰므로 API 키가 필요 없고, 계정 정보는 앱이나 저장소에 저장되지 않습니다.
   - 허용하는 도구는 파일 읽기·편집·쓰기와 LUMIQ CLI 실행뿐입니다.
 
 ## 폴더 구조
@@ -151,7 +202,7 @@ ai/                  자동 보정, AI 노이즈 제거(SCUNet), 얼굴 검출(M
 presets/             프리셋 (*.yaml), 라이트룸 xmp 읽기
 luts/                LUT (*.cube)
 models/              모델 가중치 (직접 내려받음)
-tools/               build_app.py (앱 번들), make_luts.py (LUT 생성)
+tools/               build_app.py (macOS 앱 번들), make_luts.py (LUT 생성)
 CLAUDE.md            Claude Code 작업 규칙
 ```
 

@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import sys
 from pathlib import Path
 
 from PySide6.QtCore import QObject, QProcess, QProcessEnvironment, Qt, QTimer, Signal
@@ -23,16 +24,20 @@ from pipeline.params import DATA, ROOT
 from . import theme as T
 
 BUNDLE = os.environ.get("LUMIQ_BUNDLE")  # 앱 번들 런처가 알려 주는 .app 경로
-CLI = "./lumiq" if BUNDLE else ".venv/bin/python main.py"
+WINDOWS = sys.platform == "win32"
+# Windows venv의 Python은 Scripts/ 아래 (Claude Code는 Windows에서 Git Bash로 명령을 실행하므로 / 구분자)
+CLI = "./lumiq" if BUNDLE else ".venv/Scripts/python.exe main.py" if WINDOWS else ".venv/bin/python main.py"
 ALLOWED_TOOLS = ["Read", "Edit", "Write", "Glob", "Grep", f"Bash({CLI}:*)"]
 SUGGESTIONS = ["자동으로 보기 좋게 맞춰줘", "피부를 화사하게", "필름 느낌으로", "하늘과 하이라이트 살려줘",
                "따뜻한 분위기로", "선택한 사진들 톤을 이 사진과 맞춰줘"]
 
 
 def find_claude() -> str | None:
-    cands = [shutil.which("claude"), str(Path.home() / ".local/bin/claude"), "/opt/homebrew/bin/claude",
+    exe = ".exe" if WINDOWS else ""
+    cands = [shutil.which("claude"), str(Path.home() / f".local/bin/claude{exe}"), "/opt/homebrew/bin/claude",
              "/usr/local/bin/claude", str(Path.home() / ".claude/local/claude")]
-    ext = sorted((Path.home() / ".vscode/extensions").glob("anthropic.claude-code-*/resources/native-binary/claude"))
+    ext = sorted((Path.home() / ".vscode/extensions").glob(
+        f"anthropic.claude-code-*/resources/native-binary/claude{exe}"))
     cands += [str(p) for p in reversed(ext)]
     for c in cands:
         if c and os.path.isfile(c) and os.access(c, os.X_OK):
@@ -112,8 +117,8 @@ class ClaudeRunner(QObject):
         self.proc = QProcess(self)
         self.proc.setWorkingDirectory(str(DATA))
         env = QProcessEnvironment.systemEnvironment()
-        extra = f"{Path.home()}/.local/bin:/opt/homebrew/bin:/usr/local/bin"
-        env.insert("PATH", extra + ":" + env.value("PATH", "/usr/bin:/bin"))
+        extra = [str(Path.home() / ".local" / "bin")] + ([] if WINDOWS else ["/opt/homebrew/bin", "/usr/local/bin"])
+        env.insert("PATH", os.pathsep.join(extra + [env.value("PATH", "" if WINDOWS else "/usr/bin:/bin")]))
         self.proc.setProcessEnvironment(env)
         args = []
         if session_id:

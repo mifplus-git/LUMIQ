@@ -4,10 +4,14 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageCms
+
+# Windows에서 한글 등 비ASCII 파일 이름을 exiftool이 제대로 열도록 (다른 OS는 원래 UTF-8)
+UTF8 = ["-charset", "filename=utf8"] if sys.platform == "win32" else []
 
 _SRGB_ICC = None
 
@@ -50,11 +54,11 @@ def copy_exif(src: Path, dst: Path, log=print) -> bool:
         log("  exiftool 없음: EXIF 복사 건너뜀 (brew install exiftool)")
         return False
     h, w = Image.open(dst).size[::-1]
-    cmd = ["exiftool", "-q", "-q", "-overwrite_original", "-TagsFromFile", str(src),
+    cmd = ["exiftool", *UTF8, "-q", "-q", "-overwrite_original", "-TagsFromFile", str(src),
            "-all:all", "--ICC_Profile:all", "--PreviewImage", "--ThumbnailImage", "--JpgFromRaw",
            "-Orientation=1", "-n", f"-ExifImageWidth={w}", f"-ExifImageHeight={h}",
            "-Software=LUMIQ Studio", str(dst)]
-    r = subprocess.run(cmd, capture_output=True, text=True)
+    r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
     if r.returncode != 0:
         log(f"  EXIF 복사 실패: {r.stderr.strip()}")
         return False
@@ -71,10 +75,10 @@ def write_gps(dst: Path, gps: dict, log=print) -> bool:
     if not shutil.which("exiftool"):
         log("  exiftool 없음: 위치 기록 건너뜀 (brew install exiftool)")
         return False
-    cmd = ["exiftool", "-q", "-q", "-overwrite_original", "-GPS:all=", "-GPSVersionID=2.3.0.0",
+    cmd = ["exiftool", *UTF8, "-q", "-q", "-overwrite_original", "-GPS:all=", "-GPSVersionID=2.3.0.0",
            f"-GPSLatitude={abs(lat)}", f"-GPSLatitudeRef={'N' if lat >= 0 else 'S'}",
            f"-GPSLongitude={abs(lon)}", f"-GPSLongitudeRef={'E' if lon >= 0 else 'W'}", str(dst)]
-    r = subprocess.run(cmd, capture_output=True, text=True)
+    r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
     if r.returncode != 0:
         log(f"  위치 기록 실패: {r.stderr.strip()}")
         return False
@@ -91,7 +95,8 @@ def read_exif(paths: list[Path]) -> dict:
     out = {}
     for i in range(0, len(paths), 200):
         chunk = paths[i:i + 200]
-        r = subprocess.run(["exiftool", "-j", *tags, *map(str, chunk)], capture_output=True, text=True)
+        r = subprocess.run(["exiftool", *UTF8, "-j", *tags, *map(str, chunk)], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace")
         try:
             for d in json.loads(r.stdout or "[]"):
                 out[str(Path(d["SourceFile"]).absolute())] = d

@@ -12,7 +12,6 @@ import copy
 import json
 import os
 import re
-import subprocess
 import time
 from datetime import datetime
 from pathlib import Path
@@ -31,6 +30,7 @@ from pipeline.decode import is_raw
 from pipeline.lut import lut_dirs, lut_files
 from pipeline.params import DATA, HSL_BANDS, ROOT
 
+from . import native as N
 from . import theme as T
 from .assistant import CLI, AssistantPanel, ClaudeRunner, find_claude, guide_text
 from .engine import Engine, RenderResult
@@ -141,7 +141,7 @@ class ExportDialog(QDialog):
         row.addWidget(self.out, 1)
         row.addWidget(btn)
         form.addRow("저장 폴더", row)
-        self.reveal = QCheckBox("끝나면 Finder에서 열기")
+        self.reveal = QCheckBox(f"끝나면 {N.FILE_MANAGER}에서 열기")
         self.reveal.setChecked(settings.value("export/reveal", "true") == "true")
         form.addRow("", self.reveal)
         lay.addLayout(form)
@@ -461,7 +461,7 @@ class MainWindow(QMainWindow):
         lay = QHBoxLayout(bar)
         lay.setContentsMargins(12, 6, 12, 6)
         lay.setSpacing(4)
-        self.open_btn = self._tool("folder", "폴더 열기 (⌘O)", self.choose_folder)
+        self.open_btn = self._tool("folder", f"폴더 열기 ({N.key_text('Ctrl+O')})", self.choose_folder)
         lay.addWidget(self.open_btn)
         col = QVBoxLayout()
         col.setSpacing(0)
@@ -502,10 +502,10 @@ class MainWindow(QMainWindow):
         lay.addWidget(self.crop_btn)
         lay.addWidget(self.compare_btn)
         lay.addStretch(1)
-        self.undo_btn = self._tool("undo", "실행 취소 (⌘Z)", self.undo)
-        self.redo_btn = self._tool("redo", "다시 실행 (⇧⌘Z)", self.redo)
-        self.copy_btn = self._tool("copy", "설정 복사 (⇧⌘C)", self.copy_settings)
-        self.paste_btn = self._tool("paste", "선택한 사진에 붙여넣기 (⇧⌘V)", self.paste_settings)
+        self.undo_btn = self._tool("undo", f"실행 취소 ({N.key_text('Ctrl+Z')})", self.undo)
+        self.redo_btn = self._tool("redo", f"다시 실행 ({N.key_text('Ctrl+Shift+Z')})", self.redo)
+        self.copy_btn = self._tool("copy", f"설정 복사 ({N.key_text('Ctrl+Shift+C')})", self.copy_settings)
+        self.paste_btn = self._tool("paste", f"선택한 사진에 붙여넣기 ({N.key_text('Ctrl+Shift+V')})", self.paste_settings)
         for b in (self.undo_btn, self.redo_btn):
             lay.addWidget(b)
         lay.addSpacing(8)
@@ -521,11 +521,11 @@ class MainWindow(QMainWindow):
         self.export_btn = QPushButton("  내보내기")
         self.export_btn.setObjectName("Primary")
         self.export_btn.setIcon(T.icon("export", "#1d1206", 16))
-        self.export_btn.setToolTip("내보내기 (⌘E)")
+        self.export_btn.setToolTip(f"내보내기 ({N.key_text('Ctrl+E')})")
         self.export_btn.clicked.connect(self.export_dialog)
         lay.addWidget(self.export_btn)
         lay.addSpacing(2)
-        lay.addWidget(self._tool("help", "사용법 · 단축키 (⌘?)", self.show_help, size=19))
+        lay.addWidget(self._tool("help", f"사용법 · 단축키 ({N.key_text(N.HELP_KEY)})", self.show_help, size=19))
         return bar
 
     def _build_left(self):
@@ -763,16 +763,16 @@ class MainWindow(QMainWindow):
         # 화면 확대 (사진 크기가 아니라 보이는 크기): − 맞춤 +
         zl = QHBoxLayout()
         zl.setSpacing(0)
-        zl.addWidget(self._tool("minus", "축소 (⌘−)", lambda: self._zoom(-1), size=14))
+        zl.addWidget(self._tool("minus", f"축소 ({N.key_text('Ctrl+-')})", lambda: self._zoom(-1), size=14))
         self.zoom_label = QPushButton("맞춤")
         self.zoom_label.setObjectName("Ghost")
         self.zoom_label.setFixedWidth(86)
-        self.zoom_label.setToolTip("원본 대비 크기 (100% = 원본 한 픽셀이 화면 한 픽셀). 누르면 화면에 맞추기 (⌘0)\n"
-                                   "스크롤 · 트랙패드 벌리기 · ⌘+ ⌘−로 확대·축소, 더블클릭은 맞춤 ↔ 100%, 확대 중에는 끌어서 이동\n"
+        self.zoom_label.setToolTip(f"원본 대비 크기 (100% = 원본 한 픽셀이 화면 한 픽셀). 누르면 화면에 맞추기 ({N.key_text('Ctrl+0')})\n"
+                                   f"스크롤 · 트랙패드 벌리기 · {N.key_text('Ctrl++  Ctrl+-')}로 확대·축소, 더블클릭은 맞춤 ↔ 100%, 확대 중에는 끌어서 이동\n"
                                    "화면용 미리보기(긴 변 1600px)를 키워 보여 주므로 크게 확대하면 내보낸 결과보다 흐립니다")
         self.zoom_label.clicked.connect(self.view.reset_zoom)
         zl.addWidget(self.zoom_label)
-        zl.addWidget(self._tool("plus", "확대 (⌘+)", lambda: self._zoom(1), size=14))
+        zl.addWidget(self._tool("plus", f"확대 ({N.key_text('Ctrl++')})", lambda: self._zoom(1), size=14))
         lay.addLayout(zl)
         return bar
 
@@ -821,7 +821,7 @@ class MainWindow(QMainWindow):
         rl = QVBoxLayout(right)
         rl.setContentsMargins(12, 10, 10, 8)
         rl.setSpacing(10)
-        seg, grp = self._segment([("보정", "sliders", ""), ("AI 어시스턴트", "sparkle", "AI 어시스턴트 (⌘K)")])
+        seg, grp = self._segment([("보정", "sliders", ""), ("AI 어시스턴트", "sparkle", f"AI 어시스턴트 ({N.key_text('Ctrl+K')})")])
         self.tab_adjust, self.tab_ai = grp.button(0), grp.button(1)
         self.tab_adjust.setChecked(True)
         rl.addWidget(seg)
@@ -901,7 +901,7 @@ class MainWindow(QMainWindow):
         self.denoise_check.toggled.connect(lambda on: self._set_bool("ai_denoise", on, False))
         self.camera_check = QCheckBox("카메라 톤")
         self.camera_check.setToolTip("RAW를 카메라 JPEG처럼: 액티브 D-라이팅·픽처 컨트롤이 들어간 카메라 JPEG의 밝기·채도에\n"
-                                     "맞춰 기본 톤을 잡습니다. 사진마다 켜고 끌 수 있고, 기본값은 설정(⌘,)에서 정합니다.")
+                                     f"맞춰 기본 톤을 잡습니다. 사진마다 켜고 끌 수 있고, 기본값은 설정({N.key_text('Ctrl+,')})에서 정합니다.")
         self.camera_check.toggled.connect(lambda on: self._set_bool("camera_match", on, self._camera_default()))
         row.addWidget(self.auto_check)
         row.addSpacing(4)
@@ -1073,12 +1073,12 @@ class MainWindow(QMainWindow):
         self._refresh_recent()
         m_file.addSeparator()
         act(m_file, "내보내기…", "Ctrl+E", self.export_dialog)
-        act(m_file, "Finder에서 보기", "Ctrl+Shift+R", self.reveal_current)
+        act(m_file, f"{N.FILE_MANAGER}에서 보기", "Ctrl+Shift+R", self.reveal_current)
         act(m_file, "프리셋 가져오기…", None, self.import_presets)
-        prefs = act(m_file, "설정…", QKeySequence.Preferences, self.show_settings)
+        prefs = act(m_file, "설정…", "Ctrl+,", self.show_settings)  # Windows에는 표준 설정 키가 없어 직접 정한다
         prefs.setMenuRole(QAction.PreferencesRole)  # macOS: 앱 메뉴의 '설정…' (⌘,)
         m_file.addSeparator()
-        self.trash_act = act(m_file, "휴지통으로 이동", "Ctrl+Backspace", self.trash_selected)
+        self.trash_act = act(m_file, "휴지통으로 이동", N.TRASH_KEY, self.trash_selected)
         act(m_help, f"{APP_NAME} 사용법", QKeySequence.HelpContents, self.show_help)
         act(m_help, "GitHub 저장소", None, lambda *_: QDesktopServices.openUrl(QUrl(GITHUB_URL)))
         about = act(m_help, f"{APP_NAME} 정보", None, self.show_about)
@@ -1300,7 +1300,7 @@ class MainWindow(QMainWindow):
             self._restore_adjustments(photo, before)
         self._scan_edited()
         self._refresh_badges()
-        self._flash("편집 전으로 되돌렸습니다 (⌘Z로 다시 적용)" if n == 1 else f"{n}장을 편집 전으로 되돌렸습니다")
+        self._flash(f"편집 전으로 되돌렸습니다 ({N.key_text('Ctrl+Z')}로 다시 적용)" if n == 1 else f"{n}장을 편집 전으로 되돌렸습니다")
         return True
 
     def _restore_adjustments(self, photo: Path, before: dict):
@@ -1361,7 +1361,7 @@ class MainWindow(QMainWindow):
 
     def _refresh_hint(self):
         if self.view.zoom > 1.0 and not self.compare_btn.isChecked():
-            self.info_hint.setText("끌어서 이동  ·  더블클릭 · ⌘0 맞춤")
+            self.info_hint.setText(f"끌어서 이동  ·  더블클릭 · {N.key_text('Ctrl+0')} 맞춤")
         elif self.mode != "edit":
             self.info_hint.setText("← → 이동  ·  1 2 3 별점  ·  E 편집  ·  G 그리드")
         elif self.compare_btn.isChecked():
@@ -2491,11 +2491,11 @@ class MainWindow(QMainWindow):
         if not self.current:
             return
         self._clipboard = {k: copy.deepcopy(v) for k, v in self.edit.items() if k not in PASTE_SKIP}
-        self._flash(f"설정 복사: {len(self._clipboard)}개 항목 (자르기 영역 제외)  ·  ⇧⌘V로 붙여넣기")
+        self._flash(f"설정 복사: {len(self._clipboard)}개 항목 (자르기 영역 제외)  ·  {N.key_text('Ctrl+Shift+V')}로 붙여넣기")
 
     def paste_settings(self, all_photos=False):
         if self._clipboard is None:
-            self._flash("먼저 설정 복사(⇧⌘C)를 하세요")
+            self._flash(f"먼저 설정 복사({N.key_text('Ctrl+Shift+C')})를 하세요")
             return
         targets = self.photos if all_photos else self._selected_paths()
         if not targets:
@@ -2768,10 +2768,10 @@ class MainWindow(QMainWindow):
             add("설정 복사", self.copy_settings, "copy", "Ctrl+Shift+C")
             if self._clipboard is not None:
                 add("설정 붙여넣기", self.paste_settings, "paste", "Ctrl+Shift+V")
-            add("Finder에서 보기", lambda: subprocess.run(["open", "-R", str(p)]), "finder", "Ctrl+Shift+R")
+            add(f"{N.FILE_MANAGER}에서 보기", lambda: N.reveal(p), "finder", "Ctrl+Shift+R")
             add("내보내기…", self.export_dialog, "export", "Ctrl+E")
             menu.addSeparator()
-            add("휴지통으로 이동", lambda: self.trash_photos(targets), "trash", "Ctrl+Backspace")
+            add("휴지통으로 이동", lambda: self.trash_photos(targets), "trash", N.TRASH_KEY)
         else:
             head = menu.addAction(f"선택한 사진 {n}장")
             head.setEnabled(False)
@@ -2786,7 +2786,7 @@ class MainWindow(QMainWindow):
                 add(f"선택한 {n}장에 설정 붙여넣기", self.paste_settings, "paste", "Ctrl+Shift+V")
             add(f"선택한 {n}장 내보내기…", self.export_dialog, "export", "Ctrl+E")
             menu.addSeparator()
-            add(f"선택한 {n}장 휴지통으로 이동", lambda: self.trash_photos(targets), "trash", "Ctrl+Backspace")
+            add(f"선택한 {n}장 휴지통으로 이동", lambda: self.trash_photos(targets), "trash", N.TRASH_KEY)
         chosen = menu.exec(gpos)
         menu.deleteLater()
         fn = fns.get(chosen)
@@ -2879,7 +2879,7 @@ class MainWindow(QMainWindow):
         box = QMessageBox(QMessageBox.Question, "휴지통으로 이동",
                           f"'{self._display_name(targets[0])}'을(를) 휴지통으로 옮길까요?" if n == 1
                           else f"선택한 사진 {n}장을 휴지통으로 옮길까요?", parent=self)
-        box.setInformativeText("Finder의 휴지통에서 되살릴 수 있습니다. 보정값도 함께 옮기고, "
+        box.setInformativeText(f"{N.TRASH}에서 되살릴 수 있습니다. 보정값도 함께 옮기고, "
                                "내보낸 JPEG(export 폴더)는 그대로 둡니다.")
         with_pairs = None
         if pairs:
@@ -3375,11 +3375,11 @@ class MainWindow(QMainWindow):
         else:
             self._flash(text, 8)
         if v["reveal"] and ok:
-            subprocess.run(["open", str(reveal)])
+            N.open_folder(reveal)
 
     def reveal_current(self):
         if self.current:
-            subprocess.run(["open", "-R", str(self.current)])
+            N.reveal(self.current)
 
     # ================================================================== 창
     def dragEnterEvent(self, e):
