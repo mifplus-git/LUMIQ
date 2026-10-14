@@ -1,0 +1,20 @@
+name: portrait
+description: 인물 기본. 부드러운 대비, 밝고 맑은 피부, 약한 필름 톤
+contrast: -8
+highlights: -25
+shadows: 15
+whites: 5
+blacks: -5
+texture: -10
+clarity: -5
+vibrance: 12
+saturation: -3
+hsl:
+  orange: {saturation: -8, luminance: 8}
+  red: {saturation: -5}
+skin:
+  brightness: 8
+  smooth: 15
+  saturation: -5
+sharpening: {amount: 35, radius: 1.0, detail: 20, masking: 40}
+noise_reduction: {luminance: 10, color: 25}

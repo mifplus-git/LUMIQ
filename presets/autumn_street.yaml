@@ -1,0 +1,13 @@
+name: autumn_street
+label: 가을 · 골목·거리 스냅
+description: 바랜 블랙과 그레인의 따뜻한 필름 스냅
+contrast: 5
+highlights: -25
+shadows: 15
+clarity: 5
+vibrance: 5
+saturation: -10
+tone_curve: [[0, 22], [64, 62], [192, 198], [255, 245]]
+lut: {file: luts/warm_film.cube, strength: 55}
+grain: {amount: 20, size: 25, roughness: 50}
+vignette: {amount: -12, midpoint: 50, feather: 50}

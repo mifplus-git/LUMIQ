@@ -1,0 +1,16 @@
+name: autumn_golden
+label: 가을 · 억새·노을
+description: 해 질 녘 금빛 역광과 은은한 노을
+contrast: 5
+highlights: -35
+shadows: 20
+vibrance: 15
+hsl:
+  orange: {saturation: 10}
+  yellow: {hue: -5, saturation: 10}
+  blue: {saturation: -15}
+color_grading:
+  highlights: {hue: 40, saturation: 15}
+  shadows: {hue: 220, saturation: 8}
+lut: {file: luts/golden_hour.cube, strength: 55}
+grain: {amount: 8, size: 20, roughness: 40}

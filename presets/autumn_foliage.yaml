@@ -1,0 +1,16 @@
+name: autumn_foliage
+label: 가을 · 단풍 산
+description: 붉고 노란 단풍을 진하게, 초록은 가을빛으로
+contrast: 10
+highlights: -30
+shadows: 15
+clarity: 8
+dehaze: 5
+vibrance: 18
+hsl:
+  red: {saturation: 12}
+  orange: {saturation: 15, luminance: -5}
+  yellow: {hue: -8, saturation: 10}
+  green: {hue: -25, saturation: -25}
+lut: {file: luts/autumn_amber.cube, strength: 50}
+vignette: {amount: -10, midpoint: 50, feather: 50}

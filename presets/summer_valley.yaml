@@ -1,0 +1,15 @@
+name: summer_valley
+label: 여름 · 계곡·숲
+description: 짙고 차분한 초록과 시원한 물빛
+contrast: 8
+highlights: -30
+shadows: 25
+clarity: 10
+dehaze: 10
+vibrance: 10
+saturation: -8
+hsl:
+  green: {hue: 10, saturation: -20, luminance: -5}
+  yellow: {hue: -10, saturation: -20}
+  aqua: {saturation: 10}
+lut: {file: luts/cool_film.cube, strength: 40}

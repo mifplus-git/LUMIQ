@@ -1,0 +1,22 @@
+name: spring_cherry
+label: 봄 · 벚꽃길
+description: 화사한 분홍 꽃잎과 밝은 하늘. 부드러운 대비, 파스텔 톤
+exposure: 0.15
+contrast: -10
+highlights: -25
+shadows: 20
+whites: 5
+blacks: 5
+clarity: -5
+vibrance: 10
+saturation: -5
+hsl:
+  magenta: {saturation: 10, luminance: 10}
+  red: {hue: 5, saturation: -5, luminance: 8}
+  green: {hue: 10, saturation: -15, luminance: 10}
+  blue: {saturation: -10, luminance: 10}
+color_grading:
+  highlights: {hue: 340, saturation: 8}
+  shadows: {hue: 210, saturation: 5}
+skin: {brightness: 5}
+lut: {file: luts/pastel_bloom.cube, strength: 45}

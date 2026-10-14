@@ -1,0 +1,21 @@
+# Python 3.12 arm64 네이티브 venv (Rosetta x86 아님)
+#   /opt/homebrew/bin/python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt
+# Homebrew: brew install exiftool lensfun
+rawpy>=0.27
+numpy>=2.0
+opencv-python>=4.10
+pyyaml>=6.0
+pillow>=10.0
+pillow-heif>=0.18   # HEIC·HEIF (아이폰 사진)
+torch>=2.4
+einops>=0.8
+mediapipe>=0.10.20
+lensfunpy>=1.15
+
+# 모델 가중치 (models/):
+#   scunet_color_real_psnr.pth  https://github.com/cszn/KAIR/releases/download/v1.0/scunet_color_real_psnr.pth
+#   face_landmarker.task        https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task
+
+# 데스크톱 앱
+PySide6>=6.7
+pyobjc-framework-Cocoa>=10.0   # macOS 메뉴 막대 이름 (없어도 동작)

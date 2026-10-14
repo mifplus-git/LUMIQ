@@ -1,0 +1,18 @@
+name: winter_lights
+label: 겨울 · 크리스마스 거리·조명
+description: 따뜻한 전구빛과 차가운 겨울밤의 대비
+contrast: 8
+highlights: -35
+shadows: 10
+blacks: -10
+vibrance: 10
+hsl:
+  orange: {saturation: 8, luminance: 5}
+  yellow: {saturation: 5}
+  blue: {saturation: 10, luminance: -10}
+color_grading:
+  shadows: {hue: 220, saturation: 15}
+  highlights: {hue: 40, saturation: 15}
+lut: {file: luts/teal_orange.cube, strength: 35}
+noise_reduction: {luminance: 10, color: 25}
+vignette: {amount: -15, midpoint: 45, feather: 60}
