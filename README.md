@@ -160,3 +160,8 @@ CLAUDE.md            Claude Code 작업 규칙
 - 결과는 라이트룸과 비슷하지만 같지는 않은 근사치입니다. xmp의 프로파일(내장 LUT)과 마스크 부분 보정은 적용되지 않습니다.
 - 모델 가중치는 각 배포처의 라이선스를 따릅니다: SCUNet ([cszn/KAIR](https://github.com/cszn/KAIR)),
   Face Landmarker ([Google MediaPipe](https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker)).
+
+## 라이선스
+
+LUMIQ는 [GNU General Public License v3.0](LICENSE)(GPL-3.0)으로 배포됩니다.
+외부 라이브러리와 모델 가중치는 각자의 라이선스를 따릅니다.

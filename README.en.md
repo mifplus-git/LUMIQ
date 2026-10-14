@@ -169,3 +169,8 @@ CLAUDE.md            Working rules for Claude Code
   adjustments are not applied.
 - Model weights are subject to their own licenses: SCUNet ([cszn/KAIR](https://github.com/cszn/KAIR)),
   Face Landmarker ([Google MediaPipe](https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker)).
+
+## License
+
+LUMIQ is licensed under the [GNU General Public License v3.0](LICENSE) (GPL-3.0).
+Third-party libraries and model weights are subject to their own licenses.
