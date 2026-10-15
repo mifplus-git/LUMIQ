@@ -124,7 +124,8 @@ Everything still runs without the models, but AI denoise and face detection fall
 ```
 
 It creates a test photo in a temporary folder and checks the packages, the CLI (info, preview, auto adjust, export)
-and the app window (without showing it). If every line shows ✓, the installation is complete.
+and the app window (without showing it). If every line shows ✓, the installation is complete. On GitHub, the **설치 확인** (install check) Actions workflow
+follows the same Windows steps and runs this check.
 
 ## App
 

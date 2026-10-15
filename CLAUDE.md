@@ -254,7 +254,8 @@ main.py              CLI 진입점
 app.py               데스크톱 앱 진입점 (PySide6)
 tools/make_luts.py   luts/*.cube 생성 (film.cube 제외)
 tools/build_app.py   독립 앱 번들을 /Applications에 설치 (macOS 전용. 코드·패키지를 고쳤거나 프로젝트 폴더를 옮기면 다시 실행)
-tools/smoke_test.py  설치 확인: 테스트 사진으로 CLI와 앱 창을 실제로 돌려 본다 (Mac·Windows)
+tools/smoke_test.py  설치 확인: 테스트 사진으로 CLI와 앱 창을 실제로 돌려 본다 (Mac·Windows).
+                     GitHub Actions '설치 확인'(.github/workflows/install-check.yml)이 Windows에서 --strict로 돌린다
 gui/                 앱 화면: window, widgets(슬라이더·크롭·비교선), engine(단계별 캐시 렌더), workers,
                      assistant(AI 패널 → claude -p), theme(색·아이콘), icon, native(OS별 단축키 표기·파일 관리자)
 .app_state.json      앱이 지금 보는 사진·선택 (Claude Code용, 앱이 자동으로 씀)

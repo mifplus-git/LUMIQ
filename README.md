@@ -117,7 +117,7 @@ curl.exe -L -o models/face_landmarker.task https://storage.googleapis.com/mediap
 ```
 
 임시 폴더에 테스트 사진을 만들어 패키지, CLI(정보·미리보기·자동 보정·내보내기), 앱 창(화면에 띄우지 않음)을 차례로 확인합니다.
-모두 ✓이면 설치가 끝난 것입니다.
+모두 ✓이면 설치가 끝난 것입니다. GitHub에서도 Actions의 **설치 확인**이 Windows에서 이 순서대로 설치해 같은 확인을 합니다.
 
 ## 앱
 

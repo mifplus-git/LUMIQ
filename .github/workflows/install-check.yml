@@ -1,0 +1,37 @@
+# 설치 확인: README의 Windows 설치 순서대로 설치하고 tools/smoke_test.py --strict를 돌린다.
+# Actions 탭 → '설치 확인' → Run workflow 로 실행한다 (push마다 돌지 않는다).
+name: 설치 확인
+
+on:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: exiftool
+        shell: pwsh
+        # README는 winget을 쓰지만 GitHub 실행기에는 winget이 없어 choco로 같은 exiftool을 설치한다
+        run: choco install exiftool -y --no-progress
+      - name: 설치
+        shell: pwsh
+        run: |
+          $PSNativeCommandUseErrorActionPreference = $true
+          py -3.12 -m venv .venv
+          .venv\Scripts\pip install -r requirements.txt
+      - name: 모델 가중치
+        shell: pwsh
+        run: |
+          $PSNativeCommandUseErrorActionPreference = $true
+          mkdir models
+          curl.exe -L -o models/scunet_color_real_psnr.pth https://github.com/cszn/KAIR/releases/download/v1.0/scunet_color_real_psnr.pth
+          curl.exe -L -o models/face_landmarker.task https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task
+      - name: 설치 확인
+        shell: pwsh
+        run: .venv\Scripts\python tools\smoke_test.py --strict
