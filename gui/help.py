@@ -179,12 +179,15 @@ NAME_PARTS = [("LUMI", T.TEXT, "빛과 이미지의 아름다움 — 밝기 · �
 INTRO = ("사진의 빛과 색, 노출과 디테일을 분석해 어울리는 보정을 찾고\n"
          "자동 보정으로 빠르게, 원하는 만큼 직접 다듬어 완성합니다.")
 PRODUCT_LINE = "Intelligent Photo Editing"
+AUTHOR = "mif"
+COPYRIGHT = "© 2026 mif · GPL-3.0 라이선스"  # 오픈소스(LICENSE)라 All rights reserved 대신 라이선스를 적는다
 
 
 class AboutDialog(QDialog):
-    """앱 메뉴의 'LUMIQ Studio 정보': 이름·슬로건·이름의 뜻·소개·버전·GitHub 저장소."""
+    """앱 메뉴의 'LUMIQ Studio 정보': 이름·슬로건·이름의 뜻·소개·버전·링크(홈페이지·블로그·GitHub)·제작자."""
 
-    def __init__(self, parent, app_name: str, slogan: str, slogan_en: str, formats: str, version: str, url: str):
+    def __init__(self, parent, app_name: str, slogan: str, slogan_en: str, formats: str, version: str,
+                 links: list[tuple[str, str]]):
         super().__init__(parent)
         self.setWindowTitle(f"{app_name} 정보")
         lay = QVBoxLayout(self)
@@ -230,10 +233,28 @@ class AboutDialog(QDialog):
         desc = QLabel(f"{formats}  ·  Claude Code 연동")
         desc.setStyleSheet(f"color: {T.TEXT3}; font-size: 11px;")
         lay.addWidget(desc, 0, Qt.AlignHCenter)
-        link = _link_label(url)
-        link.setStyleSheet(link.styleSheet() + " margin-top: 4px;")
-        lay.addWidget(link, 0, Qt.AlignHCenter)
-        lay.addSpacing(16)
+        lay.addSpacing(10)
+        grid = QGridLayout()  # 이름은 오른쪽 정렬, 주소는 누르면 브라우저로
+        grid.setHorizontalSpacing(12)
+        grid.setVerticalSpacing(4)
+        rows = [(label, f'<a href="{u}" style="color:{T.ACCENT_HI}; text-decoration:none;">'
+                        f'{u.removeprefix("https://")}</a>') for label, u in links] + [("제작자", AUTHOR)]
+        for r, (label, value) in enumerate(rows):
+            name = QLabel(label)
+            name.setStyleSheet(f"color: {T.TEXT3}; font-size: 12px;")
+            grid.addWidget(name, r, 0, Qt.AlignRight)
+            v = QLabel(value)
+            v.setTextFormat(Qt.RichText)
+            v.setOpenExternalLinks(True)
+            v.setStyleSheet(f"color: {T.TEXT}; font-size: 12px;")
+            grid.addWidget(v, r, 1)
+        lay.addLayout(grid)
+        lay.setAlignment(grid, Qt.AlignHCenter)
+        lay.addSpacing(12)
+        copy = QLabel(COPYRIGHT)
+        copy.setStyleSheet(f"color: {T.TEXT3}; font-size: 11px;")
+        lay.addWidget(copy, 0, Qt.AlignHCenter)
+        lay.addSpacing(14)
         ok = QPushButton("닫기")
         ok.setObjectName("Primary")
         ok.setDefault(True)

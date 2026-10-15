@@ -47,6 +47,8 @@ SLOGAN_EN = "Understand the Light. Perfect the Image."
 FORMATS = "RAW · JPG · HEIC · PNG · WebP · TIFF"
 VERSION = "1.0"  # tools/build_app.py의 CFBundleShortVersionString과 맞춘다
 GITHUB_URL = "https://github.com/mifplus-git/LUMIQ"
+# (이름, 주소): 도움말 메뉴와 정보 창에 이 순서로 나온다 (LOOM과 같은 구성)
+LINKS = [("홈페이지", "https://crm.mifplus.com"), ("블로그", "https://mifplus.com"), ("GitHub", GITHUB_URL)]
 MANY_PHOTOS = 5000  # 하위 폴더까지 이보다 많으면 열기 전에 묻는다
 BAND_KO = {"red": "빨강", "orange": "주황", "yellow": "노랑", "green": "초록", "aqua": "아쿠아",
            "blue": "파랑", "purple": "보라", "magenta": "마젠타"}
@@ -1080,7 +1082,11 @@ class MainWindow(QMainWindow):
         m_file.addSeparator()
         self.trash_act = act(m_file, "휴지통으로 이동", N.TRASH_KEY, self.trash_selected)
         act(m_help, f"{APP_NAME} 사용법", QKeySequence.HelpContents, self.show_help)
-        act(m_help, "GitHub 저장소", None, lambda *_: QDesktopServices.openUrl(QUrl(GITHUB_URL)))
+        m_help.addSeparator()
+        for label, url in LINKS:
+            act(m_help, f"{label}  ·  {url.removeprefix('https://')}", None,
+                lambda *_, u=url: QDesktopServices.openUrl(QUrl(u)))
+        m_help.addSeparator()
         about = act(m_help, f"{APP_NAME} 정보", None, self.show_about)
         about.setMenuRole(QAction.AboutRole)  # macOS: 앱 메뉴의 'LUMIQ Studio 정보'
         act(m_edit, "실행 취소", "Ctrl+Z", self.undo)
@@ -1445,7 +1451,7 @@ class MainWindow(QMainWindow):
         HelpDialog(self, APP_NAME, SLOGAN_EN, FORMATS, GITHUB_URL).exec()
 
     def show_about(self, *_):
-        AboutDialog(self, APP_NAME, SLOGAN, SLOGAN_EN, FORMATS, VERSION, GITHUB_URL).exec()
+        AboutDialog(self, APP_NAME, SLOGAN, SLOGAN_EN, FORMATS, VERSION, LINKS).exec()
 
     def close_folder(self, *_):
         """열린 폴더를 닫고 처음 화면으로 (다음 실행도 처음 화면에서 시작). 보정값·사진은 그대로."""

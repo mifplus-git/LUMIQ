@@ -123,7 +123,7 @@ def gui_check(folder: str) -> int:
             good = check(all(got[n] == N.key_text(k) for n, k in want.items()),
                          "단축키: " + ", ".join(f"{n.rstrip('…')} {got[n]}" for n in want)) and good
             HelpDialog(w, W.APP_NAME, W.SLOGAN_EN, W.FORMATS, W.GITHUB_URL)
-            AboutDialog(w, W.APP_NAME, W.SLOGAN, W.SLOGAN_EN, W.FORMATS, W.VERSION, W.GITHUB_URL)
+            AboutDialog(w, W.APP_NAME, W.SLOGAN, W.SLOGAN_EN, W.FORMATS, W.VERSION, W.LINKS)
             state["ok"] = check(True, "사용법·정보 창") and good
             w.close()
             app.quit()
