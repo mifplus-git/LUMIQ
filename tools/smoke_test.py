@@ -127,8 +127,19 @@ def gui_check(folder: str) -> int:
     saved = {k: st.value(k) for k in st.allKeys()}
     state = {"ok": False, "waited": 0}
     try:
-        w = W.MainWindow(folder)
+        st.setValue("view/layout", "grid")  # 처음 설치한 상태처럼 그리드로 시작 (저장된 보기 설정과 상관없이)
+        w = W.MainWindow(folder)  # 폴더는 이벤트 루프가 돌기 시작하면 열린다
         w.show()
+
+        def opened():
+            state["waited"] += 250
+            if not w.photos and state["waited"] < 20000:
+                QTimer.singleShot(250, opened)
+                return
+            state["in_grid"] = w._grid_shown()
+            state["waited"] = 0
+            w.set_mode("view", "single")  # 한 장 보기로 바꿔야 큰 사진을 보정해 그린다
+            QTimer.singleShot(250, poll)
 
         def poll():
             state["waited"] += 250
@@ -138,8 +149,8 @@ def gui_check(folder: str) -> int:
             if w.result is None:  # 멈춘 곳을 알 수 있게 상태줄 메시지와 모든 스레드의 위치를 남긴다
                 print(f"상태줄: {w.statusBar().currentMessage()!r}", file=sys.stderr, flush=True)
                 faulthandler.dump_traceback(file=sys.stderr, all_threads=True)
-            good = check(len(w.photos) == 1 and w.result is not None,
-                         f"사진 {len(w.photos)}장 열기 · 보정 화면 그리기 ({state['waited'] / 1000:.1f}초)")
+            good = check(len(w.photos) == 1 and state["in_grid"], f"사진 {len(w.photos)}장을 그리드로 열기")
+            good = check(w.result is not None, f"한 장 보기 · 보정 화면 그리기 ({state['waited'] / 1000:.1f}초)") and good
             keys = {a.text(): a.shortcut().toString(QKeySequence.NativeText)
                     for m in w.menuBar().actions() for a in m.menu().actions() if not a.shortcut().isEmpty()}
             # 메뉴에 실제로 걸린 키가 화면 안내(native.key_text)와 같은지
@@ -153,7 +164,7 @@ def gui_check(folder: str) -> int:
             w.close()
             app.quit()
 
-        QTimer.singleShot(250, poll)
+        QTimer.singleShot(250, opened)
         app.exec()
     finally:
         st2 = QSettings("lumiq", W.APP_NAME)
