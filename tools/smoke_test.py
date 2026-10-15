@@ -9,6 +9,7 @@
 """
 from __future__ import annotations
 
+import faulthandler
 import importlib
 import json
 import os
@@ -30,7 +31,7 @@ for _s in (sys.stdout, sys.stderr):
 
 
 def check(ok: bool, text: str) -> bool:
-    print(f"  {'✓' if ok else '✗'} {text}")
+    print(f"  {'✓' if ok else '✗'} {text}", flush=True)
     return ok
 
 
@@ -101,6 +102,8 @@ def main(strict: bool = False) -> int:
                            env={**env, "QT_QPA_PLATFORM": "offscreen"}, timeout=180)
         lines = [ln for ln in r.stdout.splitlines() if ln.startswith("  ")]
         print("\n".join(lines) if lines else f"  ✗ {(r.stderr or r.stdout).strip()[-600:]}")
+        if r.returncode != 0 and lines:  # 앱 쪽 오류 메시지·스레드 상태 (원인 찾기용)
+            print("\n".join("    " + ln for ln in r.stderr.strip().splitlines()[-60:]))
         ok = r.returncode == 0 and ok
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -132,6 +135,9 @@ def gui_check(folder: str) -> int:
             if w.result is None and state["waited"] < 60000:
                 QTimer.singleShot(250, poll)
                 return
+            if w.result is None:  # 멈춘 곳을 알 수 있게 상태줄 메시지와 모든 스레드의 위치를 남긴다
+                print(f"상태줄: {w.statusBar().currentMessage()!r}", file=sys.stderr, flush=True)
+                faulthandler.dump_traceback(file=sys.stderr, all_threads=True)
             good = check(len(w.photos) == 1 and w.result is not None,
                          f"사진 {len(w.photos)}장 열기 · 보정 화면 그리기 ({state['waited'] / 1000:.1f}초)")
             keys = {a.text(): a.shortcut().toString(QKeySequence.NativeText)
