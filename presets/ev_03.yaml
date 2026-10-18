@@ -1,0 +1,74 @@
+name: ev_03
+label: 심플레이스변형(EV.03)
+description: 라이트룸 프리셋에서 가져옴
+saturation: 0
+sharpening:
+  amount: 46
+  radius: 1.0
+  detail: 25
+  masking: 66
+noise_reduction:
+  luminance: 0
+  color: 25
+vibrance: 30
+hsl:
+  red:
+    hue: -9
+    saturation: 0
+    luminance: 0
+  orange:
+    hue: -3
+    saturation: -13
+    luminance: 8
+  yellow:
+    hue: 12
+    saturation: 0
+    luminance: 0
+  green:
+    hue: 0
+    saturation: 0
+    luminance: 8
+  aqua:
+    hue: 0
+    saturation: 0
+    luminance: 0
+  blue:
+    hue: 8
+    saturation: 0
+    luminance: 0
+  purple:
+    hue: 0
+    saturation: 0
+    luminance: 0
+  magenta:
+    hue: 0
+    saturation: 0
+    luminance: 0
+exposure: 0.3
+contrast: 17
+highlights: -100
+shadows: 60
+whites: 15
+blacks: 74
+clarity: 10
+dehaze: 0
+texture: -40
+color_grading:
+  shadows:
+    hue: 0
+    saturation: 0
+  highlights:
+    hue: 230
+    saturation: 7
+  balance: 0
+tone_curve:
+- - 0
+  - 28
+- - 49
+  - 35
+- - 129
+  - 129
+- - 195
+  - 193
+- - 240
+  - 222

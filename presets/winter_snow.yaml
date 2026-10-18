@@ -1,0 +1,18 @@
+name: winter_snow
+label: 겨울 · 설경
+description: 회색으로 가라앉기 쉬운 눈을 하얗고 깨끗하게
+exposure: 0.3
+contrast: 5
+highlights: -30
+shadows: 10
+whites: 15
+clarity: 5
+dehaze: 5
+vibrance: 5
+saturation: -5
+hsl:
+  blue: {saturation: -10, luminance: 10}
+  aqua: {saturation: -10}
+color_grading:
+  shadows: {hue: 215, saturation: 10}
+lut: {file: luts/snow_clean.cube, strength: 45}

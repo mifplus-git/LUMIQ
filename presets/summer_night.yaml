@@ -1,0 +1,17 @@
+name: summer_night
+label: 여름 · 야경·네온 도시
+description: 깊은 밤, 청록 그림자와 네온 불빛
+contrast: 10
+highlights: -30
+shadows: 10
+blacks: -15
+clarity: 10
+vibrance: 15
+hsl:
+  orange: {saturation: -15}
+  blue: {saturation: 15}
+  purple: {saturation: 10}
+  magenta: {saturation: 10}
+lut: {file: luts/neon_night.cube, strength: 55}
+noise_reduction: {luminance: 15, color: 30}
+vignette: {amount: -15, midpoint: 45, feather: 60}

@@ -1,0 +1,15 @@
+name: spring_park
+label: 봄 · 공원·들판
+description: 맑은 연두빛 신록과 상쾌한 공기
+contrast: 5
+highlights: -30
+shadows: 20
+whites: 5
+clarity: 5
+vibrance: 15
+hsl:
+  green: {hue: -8, saturation: -5, luminance: 10}
+  yellow: {saturation: -10, luminance: 5}
+  blue: {saturation: 5, luminance: -5}
+lut: {file: luts/cool_film.cube, strength: 25}
+sharpening: {amount: 35, radius: 1.0, detail: 25, masking: 20}

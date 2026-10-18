@@ -1,0 +1,17 @@
+name: spring_cafe
+label: 봄 · 카페·창가
+description: 창가 빛이 드는 실내. 따뜻하고 부드러운 크림 톤
+contrast: -8
+highlights: -20
+shadows: 15
+whites: -5
+texture: -5
+vibrance: 5
+saturation: -5
+tone_curve: [[0, 12], [128, 130], [255, 250]]
+color_grading:
+  highlights: {hue: 45, saturation: 10}
+  shadows: {hue: 30, saturation: 6}
+skin: {brightness: 6, smooth: 10}
+lut: {file: luts/warm_film.cube, strength: 50}
+grain: {amount: 10, size: 20, roughness: 40}

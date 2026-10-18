@@ -1,0 +1,19 @@
+name: snap
+description: 여행 스냅 기본. 선명하고 산뜻한 색, 하늘과 녹음 강조
+contrast: 12
+highlights: -35
+shadows: 25
+whites: 10
+blacks: -10
+texture: 10
+clarity: 12
+dehaze: 5
+vibrance: 20
+saturation: 2
+hsl:
+  blue: {saturation: 8, luminance: -8}
+  aqua: {saturation: 5}
+  green: {hue: 10, saturation: -5}
+sharpening: {amount: 45, radius: 1.0, detail: 30, masking: 20}
+noise_reduction: {luminance: 5, color: 25}
+vignette: {amount: -8, midpoint: 50}

@@ -1,0 +1,17 @@
+name: summer_city
+label: 여름 · 도심 한낮
+description: 강한 햇빛 아래 쨍하고 시원한 도시
+contrast: 15
+highlights: -35
+shadows: 15
+whites: 10
+blacks: -10
+texture: 8
+clarity: 15
+dehaze: 5
+vibrance: 12
+saturation: -5
+hsl:
+  blue: {saturation: 10, luminance: -10}
+lut: {file: luts/cool_film.cube, strength: 35}
+vignette: {amount: -8, midpoint: 50, feather: 50}

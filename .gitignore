@@ -1,0 +1,32 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# 앱이 쓰는 개인 작업 데이터
+.app_state.json
+settings.json
+previews/
+lumiq
+
+# 모델 가중치 (받는 주소는 requirements.txt)
+models/
+
+# Claude 로그인·키 (실수로 복사해도 올라가지 않게)
+.credentials.json
+.claude/settings.local.json
+.env
+.env.*
+
+# 사진 폴더에 생기는 파일 (혹시 프로젝트 안에서 작업한 경우)
+*.lumiq.json
+export/
+*.NEF
+*.nef
+
+# 개인 기획·브랜드 문서, Claude Code 개인 명령
+ref/
+.claude/

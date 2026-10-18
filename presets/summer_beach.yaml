@@ -1,0 +1,16 @@
+name: summer_beach
+label: 여름 · 바다·해변
+description: 투명한 바다색, 선명한 하늘, 따뜻한 피부와 모래
+contrast: 8
+highlights: -40
+shadows: 15
+whites: 8
+clarity: 8
+dehaze: 8
+vibrance: 22
+hsl:
+  aqua: {saturation: 20, luminance: 5}
+  blue: {saturation: 12, luminance: -10}
+  orange: {saturation: 5, luminance: 5}
+  yellow: {saturation: -10}
+lut: {file: luts/summer_aqua.cube, strength: 50}

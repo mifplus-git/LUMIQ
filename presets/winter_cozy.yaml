@@ -1,0 +1,17 @@
+name: winter_cozy
+label: 겨울 · 실내·카페
+description: 따뜻하고 아늑한 겨울 실내
+contrast: -5
+highlights: -20
+shadows: 15
+texture: -5
+vibrance: 5
+saturation: -5
+tone_curve: [[0, 10], [128, 130], [255, 248]]
+color_grading:
+  highlights: {hue: 35, saturation: 12}
+  shadows: {hue: 25, saturation: 10}
+skin: {brightness: 5, smooth: 10}
+lut: {file: luts/warm_film.cube, strength: 45}
+grain: {amount: 12, size: 20, roughness: 40}
+vignette: {amount: -12, midpoint: 50, feather: 60}
