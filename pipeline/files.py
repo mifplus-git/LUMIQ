@@ -1,6 +1,6 @@
 """사진 목록과 보정값 파일 (CLI, 앱, Claude Code가 함께 쓴다).
 
-보정값(보정·별점·위치)은 사진 바로 옆 <사진 파일 이름>.lumiq.json에 둔다 (예: DSC_1236.NEF.lumiq.json).
+보정값(보정·별점·위치)은 사진 바로 옆 <사진 파일 이름>.deskraw.json에 둔다 (예: DSC_1236.NEF.deskraw.json).
 사진과 함께 옮기면 보정값도 따라가고, 사진마다 파일이 따로라 앱과 Claude Code가 동시에 고쳐도 서로 덮어쓰지 않는다.
 """
 from __future__ import annotations
@@ -12,7 +12,8 @@ from pathlib import Path
 from .decode import IMAGE_EXTS, RAW_EXTS
 from .params import DATA
 
-SIDECAR = ".lumiq.json"  # 보정값 파일 꼬리: DSC_1236.NEF → DSC_1236.NEF.lumiq.json
+SIDECAR = ".deskraw.json"  # 보정값 파일 꼬리: DSC_1236.NEF → DSC_1236.NEF.deskraw.json
+OLD_SIDECAR = ".lumiq.json"  # 1.0까지의 꼬리 — 찾으면 새 이름으로 바꾼다 (사진 폴더를 열 때 저절로 옮겨 간다)
 LEGACY_EDITS_DIR = DATA / "edits"  # 예전 저장 위치 (migrate_legacy_edits가 사진 옆으로 옮긴다)
 # 하위 폴더를 훑을 때 건너뛰는 폴더: 내보낸 결과, 숨김 폴더, NAS·압축 부산물, 사진 앱 라이브러리 같은 패키지
 SKIP_DIRS = {"export", "@eaDir", "__MACOSX", "$RECYCLE.BIN", "System Volume Information"}
@@ -66,19 +67,35 @@ def edit_path_for(photo: Path) -> Path:
     return photo.with_name(photo.name + SIDECAR)
 
 
+def _adopt_old(old: Path, new: Path) -> Path:
+    """옛 이름의 보정값 파일을 새 이름으로. 쓸 수 없는 폴더면 옛 파일을 그대로 읽는다. 새 파일이 이미 있으면 그쪽이 최신이다."""
+    if new.exists():
+        return new
+    try:
+        old.rename(new)
+        return new
+    except OSError:
+        return old
+
+
 def find_edit(photo: Path) -> Path | None:
     p = edit_path_for(photo)
-    return p if p.is_file() else None
+    if p.is_file():
+        return p
+    old = p.with_name(p.name[:-len(SIDECAR)] + OLD_SIDECAR)
+    return _adopt_old(old, p) if old.is_file() else None
 
 
 def is_edit_file(f: Path) -> bool:
-    return Path(f).name.endswith(SIDECAR) and len(Path(f).name) > len(SIDECAR)
+    name = Path(f).name
+    return any(name.endswith(tail) and len(name) > len(tail) for tail in (SIDECAR, OLD_SIDECAR))
 
 
 def photo_for_edit(f: Path) -> Path:
-    """보정값 파일 → 사진 경로 (DSC_1236.NEF.lumiq.json → DSC_1236.NEF)."""
+    """보정값 파일 → 사진 경로 (DSC_1236.NEF.deskraw.json → DSC_1236.NEF)."""
     f = Path(f).expanduser().absolute()
-    return f.with_name(f.name[:-len(SIDECAR)])
+    tail = SIDECAR if f.name.endswith(SIDECAR) else OLD_SIDECAR
+    return f.with_name(f.name[:-len(tail)])
 
 
 def edit_files_in(dirs) -> list[Path]:
@@ -86,7 +103,11 @@ def edit_files_in(dirs) -> list[Path]:
     out = []
     for d in dirs:
         try:
+            for old in Path(d).glob("*" + OLD_SIDECAR):
+                if old.is_file():
+                    _adopt_old(old, old.with_name(old.name[:-len(OLD_SIDECAR)] + SIDECAR))
             out += [f for f in Path(d).glob("*" + SIDECAR) if f.is_file()]
+            out += [f for f in Path(d).glob("*" + OLD_SIDECAR) if f.is_file() and not f.with_name(f.name[:-len(OLD_SIDECAR)] + SIDECAR).exists()]
         except OSError:
             pass
     return out
@@ -142,7 +163,7 @@ def find_legacy_edit(photo: Path, edits_dir: Path = LEGACY_EDITS_DIR) -> Path | 
 
 
 def migrate_legacy_edits(edits_dir: Path = LEGACY_EDITS_DIR) -> tuple[list[str], list[str]]:
-    """예전 edits/*.json을 사진 옆 <사진 파일 이름>.lumiq.json으로 옮긴다. 반환: (옮긴 사진 이름, 남긴 파일 이름).
+    """예전 edits/*.json을 사진 옆 <사진 파일 이름>.deskraw.json으로 옮긴다. 반환: (옮긴 사진 이름, 남긴 파일 이름).
     사진을 찾지 못했거나 그 폴더에 쓸 수 없으면 그대로 남긴다. 옮긴 뒤 빈 edits/ 폴더는 지운다."""
     moved, left = [], []
     if not edits_dir.is_dir():

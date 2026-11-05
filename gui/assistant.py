@@ -1,10 +1,10 @@
 """AI 어시스턴트 패널: 앱 안에서 Claude Code(CLI)를 실행해 대화로 보정한다.
 
 - API 키나 LLM을 앱에 넣지 않는다. 이미 로그인된 Claude Code를 `claude -p`로 부르고, 같은 요금제 사용량을 쓴다.
-- Claude Code는 CLAUDE.md 규칙대로 사진 옆 보정값 파일(<사진 파일 이름>.lumiq.json)만 고친다.
+- Claude Code는 CLAUDE.md 규칙대로 사진 옆 보정값 파일(<사진 파일 이름>.deskraw.json)만 고친다.
   앱은 파일 변경을 감지해 바로 다시 그린다. 사진 폴더는 작업 폴더 밖이라 --add-dir로 허용한다.
 - 허용 도구: 읽기/편집/쓰기, 그리고 CLI(`.venv/bin/python main.py ...`) 실행뿐 (그 밖의 명령은 자동 거부).
-- 앱 번들로 실행하면 프로젝트 .venv 없이도 되도록 작업 폴더의 `./lumiq`(번들 안 CLI로 가는 링크)를 쓴다.
+- 앱 번들로 실행하면 프로젝트 .venv 없이도 되도록 작업 폴더의 `./deskraw`(번들 안 CLI로 가는 링크)를 쓴다.
 """
 from __future__ import annotations
 
@@ -23,10 +23,10 @@ from pipeline.params import DATA, ROOT
 
 from . import theme as T
 
-BUNDLE = os.environ.get("LUMIQ_BUNDLE")  # 앱 번들 런처가 알려 주는 .app 경로
+BUNDLE = os.environ.get("DESKRAW_BUNDLE")  # 앱 번들 런처가 알려 주는 .app 경로
 WINDOWS = sys.platform == "win32"
 # Windows venv의 Python은 Scripts/ 아래 (Claude Code는 Windows에서 Git Bash로 명령을 실행하므로 / 구분자)
-CLI = "./lumiq" if BUNDLE else ".venv/Scripts/python.exe main.py" if WINDOWS else ".venv/bin/python main.py"
+CLI = "./deskraw" if BUNDLE else ".venv/Scripts/python.exe main.py" if WINDOWS else ".venv/bin/python main.py"
 ALLOWED_TOOLS = ["Read", "Edit", "Write", "Glob", "Grep", f"Bash({CLI}:*)"]
 SUGGESTIONS = ["자동으로 보기 좋게 맞춰줘", "피부를 화사하게", "필름 느낌으로", "하늘과 하이라이트 살려줘",
                "따뜻한 분위기로", "선택한 사진들 톤을 이 사진과 맞춰줘"]
@@ -46,10 +46,10 @@ def find_claude() -> str | None:
 
 
 def ensure_cli_link():
-    """앱 번들이면 작업 폴더에 ./lumiq → 번들 안 CLI 링크를 둔다 (앱을 옮겼으면 고침, 같은 이름의 일반 파일은 그대로)."""
+    """앱 번들이면 작업 폴더에 ./deskraw → 번들 안 CLI 링크를 둔다 (앱을 옮겼으면 고침, 같은 이름의 일반 파일은 그대로)."""
     if not BUNDLE:
         return
-    link, target = DATA / "lumiq", Path(BUNDLE) / "Contents" / "MacOS" / "lumiq"
+    link, target = DATA / "deskraw", Path(BUNDLE) / "Contents" / "MacOS" / "deskraw"
     try:
         if link.is_symlink():
             if os.readlink(link) == str(target):
@@ -126,7 +126,7 @@ class ClaudeRunner(QObject):
         args += ["-p", "--output-format", "stream-json", "--verbose", "--include-partial-messages",
                  "--permission-mode", "acceptEdits", "--append-system-prompt", system,
                  "--allowedTools", *ALLOWED_TOOLS]
-        for d in dirs:  # 사진 폴더: 그 안의 .lumiq.json을 고칠 수 있도록
+        for d in dirs:  # 사진 폴더: 그 안의 .deskraw.json을 고칠 수 있도록
             args += ["--add-dir", d]
         self.proc.readyReadStandardOutput.connect(self._read)
         self.proc.readyReadStandardError.connect(lambda: setattr(self, "_err", self._err + self.proc.readAllStandardError().data()))

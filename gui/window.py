@@ -1,9 +1,9 @@
-"""LUMIQ Studio 메인 창.
+"""DeskRaw 메인 창.
 
 기본은 보기 모드(그리드 또는 한 장 + 필름스트립)이고, 편집(E)을 누르면 보정 패널이 있는 편집 화면이 된다.
 1·2·3 키로 별점을 매기고(0은 지움) 별점 필터로 골라 볼 수 있다.
 사진을 오른쪽 클릭하면 휴지통으로 이동·위치(GPS) 추가 같은 메뉴가 나온다 (여러 장 선택 시 선택한 사진 모두).
-보정값은 사진 옆 <사진 파일 이름>.lumiq.json에 바로 저장된다. Claude Code(VSCode 또는 오른쪽 AI 패널)가 같은 파일을 고치면
+보정값은 사진 옆 <사진 파일 이름>.deskraw.json에 바로 저장된다. Claude Code(VSCode 또는 오른쪽 AI 패널)가 같은 파일을 고치면
 앱에 즉시 반영되고, 앱에서 고친 값도 Claude Code가 그대로 읽는다.
 """
 from __future__ import annotations
@@ -41,13 +41,13 @@ from .widgets import (HUE_STOPS, TEMP_STOPS, TINT_STOPS, Filmstrip, Histogram, I
                       StarRating, ThumbDelegate, del_nested, get_nested, set_nested)
 from .workers import ExifJob, ExifSignals, ExportWorker, RenderWorker, ThumbJob, ThumbSignals
 
-APP_NAME = "LUMIQ Studio"
+APP_NAME = "DeskRaw"
 SLOGAN = "빛을 이해하고, 사진을 완성하다."  # 브랜드 슬로건 (Brand Identity 1.0)
 SLOGAN_EN = "Understand the Light. Perfect the Image."
 FORMATS = "RAW · JPG · HEIC · PNG · WebP · TIFF"
-VERSION = "1.0"  # tools/build_app.py의 CFBundleShortVersionString과 맞춘다
+VERSION = "1.1"  # tools/build_app.py의 CFBundleShortVersionString과 맞춘다
 GITHUB_URL = "https://github.com/mifplus-git/LUMIQ"
-# (이름, 주소): 도움말 메뉴와 정보 창에 이 순서로 나온다 (LOOM과 같은 구성)
+# (이름, 주소): 도움말 메뉴와 정보 창에 이 순서로 나온다 (DeskLoom과 같은 구성)
 LINKS = [("홈페이지", "https://crm.mifplus.com"), ("블로그", "https://mifplus.com"), ("GitHub", GITHUB_URL)]
 MANY_PHOTOS = 5000  # 하위 폴더까지 이보다 많으면 열기 전에 묻는다
 BAND_KO = {"red": "빨강", "orange": "주황", "yellow": "노랑", "green": "초록", "aqua": "아쿠아",
@@ -312,11 +312,14 @@ class MainWindow(QMainWindow):
 
     def __init__(self, start_folder: str | None = None):
         super().__init__()
-        self.settings = QSettings("lumiq", APP_NAME)
-        if not self.settings.allKeys():  # 이전 이름(RAW Fix)의 최근 폴더·창 크기를 옮겨 온다
-            old = QSettings("raw_fix", "RAW Fix")
-            for k in old.allKeys():
-                self.settings.setValue(k, old.value(k))
+        self.settings = QSettings("deskraw", APP_NAME)
+        if not self.settings.allKeys():  # 이전 이름(LUMIQ Studio, RAW Fix)의 최근 폴더·창 크기를 옮겨 온다
+            for org, name in (("lumiq", "LUMIQ Studio"), ("raw_fix", "RAW Fix")):
+                old = QSettings(org, name)
+                if old.allKeys():
+                    for k in old.allKeys():
+                        self.settings.setValue(k, old.value(k))
+                    break
         self.mode = "view"  # view: 보기 / edit: 편집
         self._edit_session: dict[str, dict] | None = None  # 편집 모드에 들어온 뒤 손댄 사진 → 그때의 보정값
         self.layout_mode = self.settings.value("view/layout", "grid")  # 보기 모드: grid / single
@@ -874,7 +877,7 @@ class MainWindow(QMainWindow):
         self.preset_combo = QComboBox()
         self.preset_combo.currentIndexChanged.connect(lambda _: self._set("preset", self.preset_combo.currentData()))
         row.addWidget(self.preset_combo, 1)
-        row.addWidget(self._tool("import", "프리셋 가져오기 — LUMIQ .yaml · 라이트룸 .xmp", self.import_presets, size=16))
+        row.addWidget(self._tool("import", "프리셋 가져오기 — DeskRaw .yaml · 라이트룸 .xmp", self.import_presets, size=16))
         row.addWidget(self._tool("save", "현재 색감·톤을 프리셋으로 저장", self.save_preset, size=16))
         row.addWidget(self._tool("trash", "프리셋 삭제…", self.delete_presets, size=16))
         lay.addLayout(row)
@@ -1088,7 +1091,7 @@ class MainWindow(QMainWindow):
                 lambda *_, u=url: QDesktopServices.openUrl(QUrl(u)))
         m_help.addSeparator()
         about = act(m_help, f"{APP_NAME} 정보", None, self.show_about)
-        about.setMenuRole(QAction.AboutRole)  # macOS: 앱 메뉴의 'LUMIQ Studio 정보'
+        about.setMenuRole(QAction.AboutRole)  # macOS: 앱 메뉴의 'DeskRaw 정보'
         act(m_edit, "실행 취소", "Ctrl+Z", self.undo)
         act(m_edit, "다시 실행", "Ctrl+Shift+Z", self.redo)
         m_edit.addSeparator()
@@ -2020,7 +2023,7 @@ class MainWindow(QMainWindow):
     def import_presets(self):
         """프리셋 파일(.yaml · 라이트룸 .xmp)을 presets/에 넣어 목록에 보이게 한다. 지금 사진에는 적용하지 않는다."""
         fs, _ = QFileDialog.getOpenFileNames(self, "프리셋 가져오기", str(Path.home()),
-                                             "프리셋 (*.yaml *.yml *.xmp);;LUMIQ 프리셋 (*.yaml *.yml);;"
+                                             "프리셋 (*.yaml *.yml *.xmp);;DeskRaw 프리셋 (*.yaml *.yml);;"
                                              "라이트룸 프리셋 (*.xmp)")
         if not fs:
             return
@@ -2407,7 +2410,7 @@ class MainWindow(QMainWindow):
             self._save_now()
 
     def _reload_from_disk(self):
-        """Claude Code 등 밖에서 보정값 파일(.lumiq.json)을 고쳤을 때 반영."""
+        """Claude Code 등 밖에서 보정값 파일(.deskraw.json)을 고쳤을 때 반영."""
         self._scan_edited()
         self._refresh_badges()
         if self.rating_filter is not None:  # 별점이 밖에서 바뀌었을 수 있다
@@ -2851,12 +2854,12 @@ class MainWindow(QMainWindow):
         return out
 
     def _migrate_legacy(self):
-        """예전 작업 폴더의 edits/*.json을 사진 옆 .lumiq.json으로 옮긴다 (사진을 못 찾은 것은 남김)."""
+        """예전 작업 폴더의 edits/*.json을 사진 옆 .deskraw.json으로 옮긴다 (사진을 못 찾은 것은 남김)."""
         moved, left = files.migrate_legacy_edits()
         if moved:
             self._scan_edited()
             self._refresh_badges()
-            self._flash(f"보정값 {len(moved)}개를 사진 옆(.lumiq.json)으로 옮겼습니다"
+            self._flash(f"보정값 {len(moved)}개를 사진 옆(.deskraw.json)으로 옮겼습니다"
                         + (f"  ·  사진을 찾지 못한 {len(left)}개는 edits/에 남김" if left else ""), 8)
 
     def _own_edit_file(self, photo: Path) -> Path | None:
@@ -3111,7 +3114,7 @@ class MainWindow(QMainWindow):
             applied = {k: v for k, v in self.result.applied.items() if k not in ("file",)}
         lines = [
             f"너는 {APP_NAME} 데스크톱 앱 오른쪽 'AI 어시스턴트' 패널에서 동작하는 사진 보정 어시스턴트다. CLAUDE.md 규칙을 따른다.",
-            "사용자는 앱 화면에서 결과를 실시간으로 본다. 보정값 파일(사진 옆 .lumiq.json)을 고치면 앱이 즉시 다시 그리므로"
+            "사용자는 앱 화면에서 결과를 실시간으로 본다. 보정값 파일(사진 옆 .deskraw.json)을 고치면 앱이 즉시 다시 그리므로"
             " --preview는 보통 필요 없다.",
             f"현재 사진: {cur} ({'RAW' if self.result is None or self.result.is_raw else 'JPG 등, 색온도는 상대값'})",
             f"현재 사진 보정값 파일: {edit_file} (없으면 이 경로로 만든다)",
@@ -3129,7 +3132,7 @@ class MainWindow(QMainWindow):
             "대상은 항상 사용자 메시지 맨 앞 [대상 사진: …]에 적힌 사진과 보정값 파일이다. 이전 대화에서 다룬 다른 사진의"
             " 파일은 사용자가 그 사진을 직접 말하지 않는 한 읽거나 고치지 않는다.",
             "사용자가 '전부/모든 사진'이라 하면 폴더 전체가 대상이다. 다른 사진의 보정값 파일은 그 사진 옆"
-            " <사진 파일 이름>.lumiq.json이다 (예: DSC_1236.NEF → DSC_1236.NEF.lumiq.json, 없으면 만든다).",
+            " <사진 파일 이름>.deskraw.json이다 (예: DSC_1236.NEF → DSC_1236.NEF.deskraw.json, 없으면 만든다).",
             f"명령은 반드시 `{CLI} ...` 한 줄로 실행한다 (cd, 파이프, &&, 다른 명령 금지)."
             + ("" if CLI.startswith(".venv") else " 이 앱 안에 든 CLI이며 CLAUDE.md의 `.venv/bin/python main.py`와 같다."),
             "원본 사진과 export 결과는 절대 지우거나 덮어쓰지 않는다. 내보내기는 사용자가 분명히 요청할 때만 한다.",

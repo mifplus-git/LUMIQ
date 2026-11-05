@@ -57,7 +57,7 @@ def copy_exif(src: Path, dst: Path, log=print) -> bool:
     cmd = ["exiftool", *UTF8, "-q", "-q", "-overwrite_original", "-TagsFromFile", str(src),
            "-all:all", "--ICC_Profile:all", "--PreviewImage", "--ThumbnailImage", "--JpgFromRaw",
            "-Orientation=1", "-n", f"-ExifImageWidth={w}", f"-ExifImageHeight={h}",
-           "-Software=LUMIQ Studio", str(dst)]
+           "-Software=DeskRaw", str(dst)]
     r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
     if r.returncode != 0:
         log(f"  EXIF 복사 실패: {r.stderr.strip()}")

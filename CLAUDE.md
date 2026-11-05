@@ -1,17 +1,17 @@
-# LUMIQ Studio: Claude Code 사진 보정 규칙
+# DeskRaw: Claude Code 사진 보정 규칙
 
-LUMIQ — 빛을 이해하고, 사진을 완성하다. (LUMI = 빛과 이미지의 아름다움, Q = Quality)
+DeskRaw — 빛을 이해하고, 사진을 완성하다. (Desk 시리즈의 사진 보정 도우미, 1.0까지의 이름은 LUMIQ Studio)
 
 니콘 Z6 NEF(및 JPG·HEIC·PNG·WebP·TIFF)를 보정해 JPEG로 내보내는 프로젝트. **보정 연산은 `main.py`(CLI)와
-`LUMIQ Studio.app`(데스크톱 앱)이 Mac에서 로컬로 하고, Claude Code는 사진 분석·보정값 결정·재조정만 한다.**
+`DeskRaw.app`(데스크톱 앱)이 Mac에서 로컬로 하고, Claude Code는 사진 분석·보정값 결정·재조정만 한다.**
 스크립트와 앱에 API나 LLM 호출을 넣지 않는다.
 
 - 실행: 항상 `.venv/bin/python main.py ...` (Python 3.12 arm64 venv, MPS 사용)
   - Windows에서는 `.venv/Scripts/python.exe main.py ...`. 설치 확인은 `tools/smoke_test.py` (README의 'OS별 설치')
-- 앱: 응용 프로그램의 `LUMIQ Studio` (`/Applications/LUMIQ Studio.app`) 또는 `.venv/bin/python app.py [폴더]`
+- 앱: 응용 프로그램의 `DeskRaw` (`/Applications/DeskRaw.app`) 또는 `.venv/bin/python app.py [폴더]`
   - 앱은 Python·패키지·코드·모델·exiftool을 모두 담은 **독립 번들**이라 이 폴더나 `.venv`, Homebrew 없이도 실행된다.
     작업 데이터(`previews/`·`.app_state.json`·저장한 프리셋)는 이 프로젝트 폴더를 그대로 쓴다 (없으면 앱이 만듦).
-    보정값은 사진 옆 `.lumiq.json`에 있다 (아래 '보정값 파일')
+    보정값은 사진 옆 `.deskraw.json`에 있다 (아래 '보정값 파일')
   - 앱은 설치할 때의 코드 사본이다. 코드를 고친 뒤 앱에 반영하려면 `.venv/bin/python tools/build_app.py`를 다시 실행
     (소스로 바로 확인할 때는 `.venv/bin/python app.py`)
   - 기본은 **보기 모드**(그리드 / 한 장 + 필름스트립, G로 그리드), **편집**(E)을 누르면 보정 패널이 있는 편집 화면
@@ -36,23 +36,24 @@ LUMIQ — 빛을 이해하고, 사진을 완성하다. (LUMI = 빛과 이미지�
   - 폴더를 열면 **하위 폴더의 사진까지** 함께 연다 (보기 메뉴 '하위 폴더 포함'으로 끔). `export/`·숨김 폴더는 제외.
     이때 '폴더 전체'를 CLI로 처리하려면 `--recursive`를 붙인다
 - 브랜드: Q는 Quality(AI의 약자 아님),
-  화면에서는 LUMIQ의 Q만 강조색 (`gui/theme.py`의 `wordmark()`)
+  화면에서는 DeskRaw의 Raw만 강조색 (`gui/theme.py`의 `wordmark()`)
 
 ## 앱과 함께 쓰기
 
-- **보정값 파일**: 사진 바로 옆 `<사진 파일 이름>.lumiq.json` (예: `~/Photos/0901/DSC_1236.NEF` →
-  `~/Photos/0901/DSC_1236.NEF.lumiq.json`). 보정값·별점·위치가 여기에 있다. 따로 모아 두는 폴더는 없다.
+- 1.0까지의 보정값 파일 꼬리는 `.lumiq.json`이다. 앱과 CLI가 찾으면 새 이름으로 바꾸니 새로 만들지 않는다.
+- **보정값 파일**: 사진 바로 옆 `<사진 파일 이름>.deskraw.json` (예: `~/Photos/0901/DSC_1236.NEF` →
+  `~/Photos/0901/DSC_1236.NEF.deskraw.json`). 보정값·별점·위치가 여기에 있다. 따로 모아 두는 폴더는 없다.
   `file` 항목은 필요 없다 (파일 이름이 곧 사진). 확장자까지 붙이므로 RAW+JPEG 쌍도 겹치지 않는다.
   값이 하나도 남지 않으면 앱이 파일을 지운다. 예전 `edits/*.json`이 남아 있으면 앱이 시작할 때 사진 옆으로 옮긴다.
 - 앱과 Claude Code는 **같은 보정값 파일을 공유**한다. 앱에서 슬라이더를 움직이면 바로 저장되고,
   Claude Code가 파일을 고치거나 새로 만들면 앱이 자동으로 다시 불러와 화면에 반영한다.
-- 사용자가 "앱에서 보정한 DSC_1236" 같은 말을 하면 그 사진 옆 `.lumiq.json`을 읽어 현재 값을 확인한 뒤 고친다.
+- 사용자가 "앱에서 보정한 DSC_1236" 같은 말을 하면 그 사진 옆 `.deskraw.json`을 읽어 현재 값을 확인한 뒤 고친다.
 - **"지금 보고 있는 사진", "이 사진"**은 프로젝트 루트의 `.app_state.json`을 읽어 찾는다:
   `current`(사진 경로), `current_edit_file`(보정값 파일 전체 경로, 아직 없을 수 있음), `current_preview`(지금 화면 그대로의 1024px 이미지,
   `previews/_app_current.jpg`), `selected`(앱에서 선택한 사진들). 화면을 봐야 하면 `current_preview`만 Read한다.
   앱에서 폴더를 닫으면(폴더 이름 옆 ×) `current`가 `null`이다 — 이때는 어떤 사진인지 사용자에게 묻는다.
 - 앱 오른쪽의 **AI 어시스턴트** 패널도 Claude Code(`claude -p`)를 부른다. 이때는 시스템 프롬프트로 현재 사진·적용값이
-  함께 전달되고, 허용 도구는 읽기·편집·쓰기와 CLI 실행뿐이다. 앱 번들에서는 CLI가 `./lumiq ...`
+  함께 전달되고, 허용 도구는 읽기·편집·쓰기와 CLI 실행뿐이다. 앱 번들에서는 CLI가 `./deskraw ...`
   (앱이 이 폴더에 만드는 번들 CLI 링크, `.venv/bin/python main.py`와 같음)다.
 - 앱이 열려 있어도 `--preview`는 그대로 써도 된다. 다만 사용자가 앱 화면에서 보고 있다면
   json만 고치고 "앱에서 확인해 보세요"라고 해도 된다 (미리보기 생성·열람 생략 → 사용량 절약).
@@ -68,13 +69,13 @@ LUMIQ — 빛을 이해하고, 사진을 완성하다. (LUMI = 빛과 이미지�
 ## 절대 규칙
 
 1. **원본 사진(NEF·JPG 등)은 수정·이동·삭제하지 않는다.** 원본 폴더에 쓰는 것은 `export/` 하위 폴더,
-   사진별 보정값 파일 `<사진 파일 이름>.lumiq.json`, 사진별 `.yaml`뿐.
+   사진별 보정값 파일 `<사진 파일 이름>.deskraw.json`, 사진별 `.yaml`뿐.
    앱의 '휴지통으로 이동'은 사용자가 직접 하는 동작이다 (macOS 휴지통으로, 보정값 json·같은 이름의 .yaml·.xmp와
    숨겨진 RAW+JPEG 쌍의 JPG도 함께). Claude Code는 사용자가 부탁해도 사진을 지우지 말고 앱에서 하도록 안내한다.
 2. **export 결과 JPEG를 지우거나 덮어쓰지 않는다.** (스크립트가 같은 이름이면 `_1`, `_2` 번호를 붙임)
 3. **사진은 `previews/`의 1024px 미리보기만 Read로 본다.** NEF나 원본 크기 export 파일은 열지 않는다 (사용량 절약).
 4. **한 번에 바꾸는 항목은 사용자가 요청한 것 위주.** 요청과 무관한 값을 함께 바꾸지 않는다.
-5. 보정값은 사진 옆 `<사진 파일 이름>.lumiq.json`에만 쓴다. 스크립트 코드를 고쳐서 보정하지 않는다.
+5. 보정값은 사진 옆 `<사진 파일 이름>.deskraw.json`에만 쓴다. 스크립트 코드를 고쳐서 보정하지 않는다.
 6. 미리보기를 볼 때는 바꾼 사진만 본다. 여러 장이면 꼭 필요한 것만 골라 본다.
 
 ## 작업 순서
@@ -84,7 +85,7 @@ LUMIQ — 빛을 이해하고, 사진을 완성하다. (LUMI = 빛과 이미지�
    .venv/bin/python main.py ~/Photos/0901 --info            # 폴더: 장당 한 줄 요약
    .venv/bin/python main.py ~/Photos/0901/DSC_1236.NEF --info  # 한 장: 전체 항목
    ```
-2. 사진 옆 `<사진 파일 이름>.lumiq.json` 작성 (예: `~/Photos/0901/DSC_1236.NEF.lumiq.json`, 아래 형식,
+2. 사진 옆 `<사진 파일 이름>.deskraw.json` 작성 (예: `~/Photos/0901/DSC_1236.NEF.deskraw.json`, 아래 형식,
    이미 있으면 그 파일을 고침)
 3. 미리보기 생성 (사진 옆 보정값 파일이 자동으로 적용됨): `.venv/bin/python main.py ~/Photos/0901/DSC_1236.NEF --preview`
    - 폴더 전체: `.venv/bin/python main.py ~/Photos/0901 --preview`
@@ -108,7 +109,7 @@ LUMIQ — 빛을 이해하고, 사진을 완성하다. (LUMI = 빛과 이미지�
 | `-r`, `--recursive` | 폴더 입력일 때 하위 폴더의 사진까지 (`export/`·숨김 폴더 제외) |
 | `--info` | EXIF, ISO, 화이트밸런스, 히스토그램 요약, 얼굴 위치, 자동 수평 각도, 자동 보정 제안(`auto_suggestion`)을 JSON으로 출력. 여러 장이면 요약, `--verbose`로 전체 |
 | `--preview` | 긴 변 1024px 미리보기를 `previews/<파일명>.jpg`에 저장 (매번 덮어씀) |
-| `--params 파일\|폴더` | 생략하면 사진 옆 `.lumiq.json`을 쓴다. 다른 보정값 JSON/YAML을 쓸 때만 지정 (폴더면 사진마다 `<사진 파일 이름>.lumiq.json`) |
+| `--params 파일\|폴더` | 생략하면 사진 옆 `.deskraw.json`을 쓴다. 다른 보정값 JSON/YAML을 쓸 때만 지정 (폴더면 사진마다 `<사진 파일 이름>.deskraw.json`) |
 | `--preset 이름` | `presets/<이름>.yaml` (기본 `portrait`·`snap` + 계절·장소 13종, 아래 '프리셋' 참고) |
 | `--xmp 파일` | 라이트룸 .xmp 프리셋 |
 | `--auto` | 원클릭 자동 보정 (노출·WB·톤, 얼굴 노출 우선) |
@@ -122,10 +123,10 @@ LUMIQ — 빛을 이해하고, 사진을 완성하다. (LUMI = 빛과 이미지�
 | `--exposure`, `--wb`(색온도), `--tint`, `--contrast` 등 | 단일 보정값 |
 | `--device cpu` | GPU(MPS) 대신 CPU |
 
-## 보정값 파일(.lumiq.json) 형식
+## 보정값 파일(.deskraw.json) 형식
 
 항목 이름은 라이트룸 방식 프리셋과 같다. 쓰지 않는 항목은 생략한다 (생략 = 프리셋 값 또는 0).
-아래는 `~/Photos/0901/DSC_1236.NEF.lumiq.json`의 예:
+아래는 `~/Photos/0901/DSC_1236.NEF.deskraw.json`의 예:
 
 ```json
 {
@@ -177,14 +178,14 @@ LUMIQ — 빛을 이해하고, 사진을 완성하다. (LUMI = 빛과 이미지�
 | `auto_level` | `true`(기본)/`false` | 직선이 부족한 사진은 자동으로 회전 안 함. 앱에서 화면으로 각도를 맞추면 `false`로 고정됨 |
 | `lens` | `true`(기본)/`false` | lensfun 렌즈 보정, 프로필 없으면 건너뜀 |
 | `camera_match` | `true/false` | RAW만. RAW 안의 카메라 JPEG(니콘 액티브 D-라이팅·픽처 컨트롤이 들어간 밝기·채도)에 맞춰 기본 톤을 잡는다. 디코딩 직후에 적용되어 노출·자동 보정·슬라이더는 그 위에서 동작. 생략하면 `settings.json`의 `camera_match_default`(없으면 끔). 앱의 '카메라 톤' |
-| `rating` | 1~3 | 별점 (앱의 1·2·3 키, 0 키는 이 항목을 지움). 보정값이 아니라 렌더·내보내기에 영향 없고, 썸네일 '보정함' 표시·설정 복사·프리셋 저장에서 빠진다. "별점 3개인 사진"은 사진 옆 `.lumiq.json`의 `rating`으로 찾는다 |
+| `rating` | 1~3 | 별점 (앱의 1·2·3 키, 0 키는 이 항목을 지움). 보정값이 아니라 렌더·내보내기에 영향 없고, 썸네일 '보정함' 표시·설정 복사·프리셋 저장에서 빠진다. "별점 3개인 사진"은 사진 옆 `.deskraw.json`의 `rating`으로 찾는다 |
 | `gps` | `{"lat": 37.5665, "lon": 126.978, "name": "서울시청"}` | 위치 추가 (위도 −90~90, 경도 −180~180, `name`은 표시용·선택). 원본은 그대로 두고 **내보낸 JPEG**에만 기록 (원래 GPS가 있으면 이 값으로 바뀜). 보정값이 아니라 썸네일 '보정함' 표시·설정 복사·프리셋 저장에서 빠진다. 앱의 오른쪽 클릭 '위치(GPS) 추가'가 쓰는 항목 |
 
 범위를 벗어난 값은 스크립트가 잘라내고 경고한다.
 
 ### 설정 우선순위
 
-뒤의 값이 앞의 값을 덮어쓴다: **자동 보정 < 프리셋/xmp < 사진별 yaml(NEF 옆 `DSC_1236.yaml`) < 보정값 파일(`.lumiq.json`) < CLI 옵션**
+뒤의 값이 앞의 값을 덮어쓴다: **자동 보정 < 프리셋/xmp < 사진별 yaml(NEF 옆 `DSC_1236.yaml`) < 보정값 파일(`.deskraw.json`) < CLI 옵션**
 
 - 단, `auto`가 켜져 있으면 프리셋의 `exposure`, `highlights`, `shadows`, `whites`, `blacks`는 자동값에 **더해진다**.
 - 보정값 파일의 값은 **최종값**이다. 자동값 기준으로 조금 바꾸려면 `적용값:` 로그나 `--info`의 `auto_suggestion`에 더한 값을 쓴다.
@@ -216,7 +217,7 @@ LUMIQ — 빛을 이해하고, 사진을 완성하다. (LUMI = 빛과 이미지�
 - 위치: `presets/<이름>.yaml`, 이름은 영문 소문자·숫자·밑줄 (`my_film`, `cafe_warm`)
 - 저장: `.venv/bin/python main.py ~/Photos/0901/DSC_1236.NEF --save-preset my_film`
   (그 사진의 프리셋+보정값 파일 값을 합쳐 저장. 노출·WB·크롭 같은 사진별 값은 빠짐)
-- 여러 사진에 적용: 각 사진 옆 `.lumiq.json`의 `"preset"`을 바꾸거나 `--preset my_film`
+- 여러 사진에 적용: 각 사진 옆 `.deskraw.json`의 `"preset"`을 바꾸거나 `--preset my_film`
 - 기존 프리셋 파일을 덮어쓰기 전에 사용자에게 확인한다.
 - 파일 머리의 `label`(앱에 보일 한글 이름)·`description`은 설명용이라 보정값이 아니다.
   이름이 `spring_`·`summer_`·`autumn_`·`winter_`로 시작하면 앱 목록에서 계절별로 묶인다.
@@ -258,7 +259,7 @@ tools/smoke_test.py  설치 확인: 테스트 사진으로 CLI와 앱 창을 실
 gui/                 앱 화면: window, widgets(슬라이더·크롭·비교선), engine(단계별 캐시 렌더), workers,
                      assistant(AI 패널 → claude -p), theme(색·아이콘), icon, native(OS별 단축키 표기·파일 관리자)
 .app_state.json      앱이 지금 보는 사진·선택 (Claude Code용, 앱이 자동으로 씀)
-lumiq                앱 번들 안 CLI로 가는 링크 (AI 패널이 만듦, = main.py)
+deskraw                앱 번들 안 CLI로 가는 링크 (AI 패널이 만듦, = main.py)
 pipeline/            decode, lens, geometry, tone, skin, lut, detail, export, params, runner, files
 ai/                  auto(원클릭), denoise(SCUNet), face(MediaPipe)
 presets/             *.yaml, xmp_reader.py
@@ -268,7 +269,7 @@ previews/            1024px 미리보기 (Claude Code가 보는 곳)
 settings.json        보정 결과에 영향을 주는 앱 설정 (camera_match_default). 앱의 설정(⌘,)이 씀
 pipeline/camera.py   카메라 톤 맞추기 (내장 카메라 JPEG에 밝기·채도 맞춤)
 
-(사진 폴더)/DSC_1236.NEF.lumiq.json   그 사진의 보정값 (사진 옆, 사진마다 하나)
+(사진 폴더)/DSC_1236.NEF.deskraw.json   그 사진의 보정값 (사진 옆, 사진마다 하나)
 ```
 
 ## 참고
@@ -276,4 +277,4 @@ pipeline/camera.py   카메라 톤 맞추기 (내장 카메라 JPEG에 밝기·�
 - 결과는 라이트룸과 비슷하지만 같지 않은 근사치다. xmp의 프로파일(내장 LUT)과 마스크 부분 보정은 무시된다.
 - 피부 보정·자동 보정의 얼굴 검출은 MediaPipe. 얼굴이 없으면 피부 보정은 건너뛴다.
 - 미리보기는 절반 크기로 디코딩해 빠르게(약 0.5초) 만든다. 최종 결과와 색·톤은 같고 디테일(샤프닝·노이즈)만 조금 다르다.
-- 앱 로그: `~/Library/Logs/LUMIQ Studio.log`
+- 앱 로그: `~/Library/Logs/DeskRaw.log`

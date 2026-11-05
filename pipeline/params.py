@@ -15,9 +15,9 @@ import yaml
 
 # 프로그램(코드·기본 프리셋·LUT·모델). 앱 번들로 실행하면 번들 안이라 쓰지 않는다.
 ROOT = Path(__file__).resolve().parent.parent
-# 작업 데이터(previews/·.app_state.json·저장한 프리셋·LUT. 보정값은 사진 옆 .lumiq.json). 소스로 실행하면 ROOT,
-# 앱 번들은 런처가 LUMIQ_DATA로 알려 준다 (tools/build_app.py가 이 프로젝트 폴더로 정함).
-DATA = Path(os.environ["LUMIQ_DATA"]).expanduser() if os.environ.get("LUMIQ_DATA") else ROOT
+# 작업 데이터(previews/·.app_state.json·저장한 프리셋·LUT. 보정값은 사진 옆 .deskraw.json). 소스로 실행하면 ROOT,
+# 앱 번들은 런처가 DESKRAW_DATA로 알려 준다 (tools/build_app.py가 이 프로젝트 폴더로 정함).
+DATA = Path(os.environ["DESKRAW_DATA"]).expanduser() if os.environ.get("DESKRAW_DATA") else ROOT
 PRESET_DIR = DATA / "presets"  # 프리셋 저장 위치
 CONFIG_FILE = DATA / "settings.json"  # 앱 설정 중 보정 결과에 영향을 주는 것 (CLI도 같은 값을 쓴다)
 
@@ -234,7 +234,7 @@ def preset_slug(text: str) -> str:
 
 
 def read_preset_file(src) -> tuple[dict, str, str, list[str]]:
-    """가져올 프리셋 파일(LUMIQ .yaml/.yml 또는 라이트룸 .xmp) → (값, 앱에 보일 이름, 설명, 알림).
+    """가져올 프리셋 파일(DeskRaw .yaml/.yml 또는 라이트룸 .xmp) → (값, 앱에 보일 이름, 설명, 알림).
     알 수 없는 항목은 빼고 알림에 적는다. 값이 하나도 없으면 ValueError."""
     src = Path(src)
     notes: list[str] = []

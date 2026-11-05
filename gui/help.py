@@ -56,7 +56,7 @@ def help_html(formats: str) -> str:
             "처음 화면의 최근 폴더 옆 <b>×</b>는 목록에서만 지웁니다 (폴더와 사진은 그대로).",
             f"지원 형식: {formats}",
             "폴더 이름 옆 <b>×</b>로 폴더를 닫고 처음 화면으로 돌아갑니다.",
-            "원본 사진은 절대 바뀌지 않습니다. 보정값은 사진 옆 <b>.lumiq.json</b> 파일(예: DSC_1236.NEF.lumiq.json)에 "
+            "원본 사진은 절대 바뀌지 않습니다. 보정값은 사진 옆 <b>.deskraw.json</b> 파일(예: DSC_1236.NEF.deskraw.json)에 "
             "저장되고 언제든 되돌릴 수 있어요. 사진과 함께 옮기면 보정값도 따라갑니다 "
             "(직접 휴지통으로 옮길 때만 사진 파일이 움직입니다).",
         ]),
@@ -94,7 +94,7 @@ def help_html(formats: str) -> str:
             "보입니다. 켜면 RAW 안의 카메라 JPEG 밝기·채도에 맞춰 기본 톤을 잡습니다. 사진마다 켜고 끌 수 있고, 기본값은 "
             f"<b>설정</b>({_key('Ctrl+,')})에서 정합니다.",
             "프리셋 · 라이트룸 xmp · LUT로 색감을 입히고, 마음에 드는 색감은 프리셋으로 저장하세요.",
-            "<b>프리셋 가져오기</b>(프리셋 옆 ↓ 버튼 · 파일 메뉴): LUMIQ 프리셋(.yaml)이나 라이트룸 프리셋(.xmp)을 "
+            "<b>프리셋 가져오기</b>(프리셋 옆 ↓ 버튼 · 파일 메뉴): DeskRaw 프리셋(.yaml)이나 라이트룸 프리셋(.xmp)을 "
             "목록에 추가합니다. 여러 개를 한 번에 고를 수 있어요.",
             "<b>프리셋 삭제</b>(프리셋 옆 휴지통 버튼 · 편집 메뉴): 내가 만든·가져온 프리셋은 휴지통으로, 기본 프리셋은 "
             "목록에서 숨깁니다 (같은 창에서 다시 보이기).",
@@ -174,8 +174,8 @@ class HelpDialog(QDialog):
 
 
 # 앱 정보 창의 브랜드 소개 (Brand Identity 1.0을 줄여 정리: 이름의 뜻 + 핵심 가치 세 가지를 두 줄로)
-NAME_PARTS = [("LUMI", T.TEXT, "빛과 이미지의 아름다움 — 밝기 · 색감 · 분위기"),
-              ("Q", T.ACCENT_HI, "Quality — 사진의 품질과 완성도")]
+NAME_PARTS = [("Desk", T.TEXT, "하는 일에 꼭 맞는 프로그램 — Desk 시리즈"),
+              ("Raw", T.ACCENT_HI, "RAW 사진부터 — 빛 · 색감 · 디테일을 다듬어 완성")]
 INTRO = ("사진의 빛과 색, 노출과 디테일을 분석해 어울리는 보정을 찾고\n"
          "자동 보정으로 빠르게, 원하는 만큼 직접 다듬어 완성합니다.")
 PRODUCT_LINE = "Intelligent Photo Editing"
@@ -184,7 +184,7 @@ COPYRIGHT = "© 2026 mif · GPL-3.0 라이선스"  # 오픈소스(LICENSE)라 Al
 
 
 class AboutDialog(QDialog):
-    """앱 메뉴의 'LUMIQ Studio 정보': 이름·슬로건·이름의 뜻·소개·버전·링크(홈페이지·블로그·GitHub)·제작자."""
+    """앱 메뉴의 'DeskRaw 정보': 이름·슬로건·이름의 뜻·소개·버전·링크(홈페이지·블로그·GitHub)·제작자."""
 
     def __init__(self, parent, app_name: str, slogan: str, slogan_en: str, formats: str, version: str,
                  links: list[tuple[str, str]]):

@@ -1,17 +1,19 @@
-# LUMIQ Studio
+<img src="gui/assets/icon-256.png" alt="" width="96">
+
+# DeskRaw
+
+> 예전 이름은 LUMIQ Studio입니다. 저장소 주소는 그대로이고, 이 저장소의 이름 · 아이콘만 Desk 시리즈에 맞춰 바꿨습니다.
+> 예전 보정값 파일(`.lumiq.json`)은 사진 폴더를 열 때 저절로 새 이름으로 바뀌고, 최근 폴더 · 창 크기도 이어집니다.
 
 **한국어** · [English](README.en.md)
 
 > **빛을 이해하고, 사진을 완성하다.**  
 > Understand the Light. Perfect the Image.
 
-LUMIQ는 AI로 사진의 빛과 색상, 노출과 디테일을 분석해 사진의 품질과 완성도를 높이는 지능형 사진 편집 브랜드입니다.
+DeskRaw는 AI로 사진의 빛과 색상, 노출과 디테일을 분석해 사진의 품질과 완성도를 높이는 지능형 사진 편집 도구입니다.
 누구나 빠르고 간편하게 사진을 완성할 수 있게 하면서도, 자신의 취향과 스타일대로 직접 다듬는 편집의 자유를 함께 지향합니다.
 
-- **LUMI**: 빛과 이미지의 아름다움 (밝기, 색감, 분위기)
-- **Q**: Quality, 사진의 품질과 완성도
-
-**LUMIQ Studio**는 니콘 Z6 RAW(NEF)와 JPG·HEIC·PNG·WebP·TIFF 사진을 보정해 JPEG로 내보내는 사진 보정 도구입니다.
+**DeskRaw**는 니콘 Z6 RAW(NEF)와 JPG·HEIC·PNG·WebP·TIFF 사진을 보정해 JPEG로 내보내는 사진 보정 도구입니다.
 데스크톱 앱과 명령줄(CLI) 두 가지로 쓸 수 있고, Apple Silicon(M 칩) Mac과 Windows에서 실행됩니다.
 
 보정 연산은 모두 내 컴퓨터에서 로컬로 처리합니다. [Claude Code](https://claude.com/claude-code)와 함께 쓰면 Claude가 사진을 분석해
@@ -29,14 +31,14 @@ LUMIQ는 AI로 사진의 빛과 색상, 노출과 디테일을 분석해 사진�
 - **LUT 12종**: 필름, 시네마 틸·오렌지, 골든아워, 파스텔 블룸, 흑백 필름 등
 - **기하 보정**: 렌즈 보정(lensfun), 자동 수평, 크롭(3:2·4:5·1:1·16:9·자유), 회전·반전
 - **정리**: 별점, 별점 필터, 위치(GPS) 추가, 원본 EXIF 유지
-- **원본은 절대 바꾸지 않습니다.** 보정값은 사진 옆 `<사진 파일 이름>.lumiq.json`에 저장됩니다
+- **원본은 절대 바꾸지 않습니다.** 보정값은 사진 옆 `<사진 파일 이름>.deskraw.json`에 저장됩니다
 
 ## 지원 환경
 
 | | Mac (Apple Silicon, M 칩) | Windows 10·11 (64비트) |
 | --- | --- | --- |
 | 앱·CLI | ✅ | ✅ |
-| 독립 앱 만들기 | ✅ `LUMIQ Studio.app` | — (소스에서 실행, 바로가기로 띄움) |
+| 독립 앱 만들기 | ✅ `DeskRaw.app` | — (소스에서 실행, 바로가기로 띄움) |
 | AI 노이즈 제거 | GPU (MPS) | CPU (느림) |
 | 파일 위치 보기 | Finder | 파일 탐색기 |
 
@@ -51,14 +53,14 @@ LUMIQ는 AI로 사진의 빛과 색상, 노출과 디테일을 분석해 사진�
 
 ```bash
 brew install python@3.12 exiftool
-git clone https://github.com/mifplus-git/LUMIQ.git
-cd LUMIQ
+git clone https://github.com/mifplus-git/LUMIQ.git DeskRaw
+cd DeskRaw
 /opt/homebrew/bin/python3.12 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 .venv/bin/python app.py
 ```
 
-**독립 앱 만들기**: Python·패키지·코드·모델·exiftool을 모두 담은 `LUMIQ Studio.app`을 만듭니다.
+**독립 앱 만들기**: Python·패키지·코드·모델·exiftool을 모두 담은 `DeskRaw.app`을 만듭니다.
 이 폴더나 Homebrew 없이도 실행되고, 코드를 고친 뒤에는 다시 만들어야 앱에 반영됩니다.
 Xcode 명령줄 도구가 필요합니다 (`xcode-select --install`).
 
@@ -75,15 +77,15 @@ PowerShell에서 실행합니다.
 winget install Python.Python.3.12
 winget install OliverBetz.ExifTool
 # 설치한 뒤 PowerShell을 새로 열어야 PATH가 반영됩니다
-git clone https://github.com/mifplus-git/LUMIQ.git
-cd LUMIQ
+git clone https://github.com/mifplus-git/LUMIQ.git DeskRaw
+cd DeskRaw
 py -3.12 -m venv .venv
 .venv\Scripts\pip install -r requirements.txt
 .venv\Scripts\python app.py
 ```
 
 - 콘솔 창 없이 띄우려면 `.venv\Scripts\pythonw app.py`를 씁니다.
-- 바탕 화면 바로가기: 대상은 `<LUMIQ 폴더>\.venv\Scripts\pythonw.exe app.py`, 시작 위치는 `<LUMIQ 폴더>`로 지정합니다.
+- 바탕 화면 바로가기: 대상은 `<DeskRaw 폴더>\.venv\Scripts\pythonw.exe app.py`, 시작 위치는 `<DeskRaw 폴더>`로 지정합니다. 아이콘은 `gui\assets\icon.ico`를 고르면 됩니다.
 - 아래 예시의 `.venv/bin/python`은 Windows에서 `.venv\Scripts\python`입니다.
 
 ### 모델 가중치 (Mac·Windows 공통)
@@ -161,7 +163,7 @@ curl.exe -L -o models/face_landmarker.task https://storage.googleapis.com/mediap
 
 ## 보정값 파일
 
-사진마다 옆에 `<사진 파일 이름>.lumiq.json`이 생깁니다 (예: `DSC_1236.NEF` → `DSC_1236.NEF.lumiq.json`).
+사진마다 옆에 `<사진 파일 이름>.deskraw.json`이 생깁니다 (예: `DSC_1236.NEF` → `DSC_1236.NEF.deskraw.json`).
 앱과 CLI, Claude Code가 같은 파일을 함께 쓰므로, 어느 쪽에서 고쳐도 다른 쪽에 바로 반영됩니다.
 
 ```json
@@ -177,17 +179,17 @@ curl.exe -L -o models/face_landmarker.task https://storage.googleapis.com/mediap
 }
 ```
 
-설정 우선순위 (뒤가 앞을 덮어씀): 자동 보정 < 프리셋/xmp < 사진별 yaml < `.lumiq.json` < CLI 옵션.
+설정 우선순위 (뒤가 앞을 덮어씀): 자동 보정 < 프리셋/xmp < 사진별 yaml < `.deskraw.json` < CLI 옵션.
 항목별 값 범위는 [CLAUDE.md](CLAUDE.md)에 정리되어 있습니다.
 
 ## Claude Code와 함께 쓰기
 
 - 이 폴더에서 Claude Code를 열면 [CLAUDE.md](CLAUDE.md)의 규칙에 따라 작업합니다.
-  `--info`로 사진 확인 → `.lumiq.json` 작성 → `--preview`로 미리보기 → 확인 후 재조정 → 내보내기 순서입니다.
+  `--info`로 사진 확인 → `.deskraw.json` 작성 → `--preview`로 미리보기 → 확인 후 재조정 → 내보내기 순서입니다.
   예: "DSC_1236 좀 어둡고 피부가 칙칙해", "0901 폴더 인물 프리셋으로 정리해줘"
 - 앱의 **AI 어시스턴트**(⌘K · Ctrl+K)는 컴퓨터에 설치된 `claude`를 `claude -p`로 실행합니다.
   - 각자 컴퓨터에 로그인된 Claude Code를 그대로 쓰므로 API 키가 필요 없고, 계정 정보는 앱이나 저장소에 저장되지 않습니다.
-  - 허용하는 도구는 파일 읽기·편집·쓰기와 LUMIQ CLI 실행뿐입니다.
+  - 허용하는 도구는 파일 읽기·편집·쓰기와 DeskRaw CLI 실행뿐입니다.
 
 ## 폴더 구조
 
@@ -212,5 +214,5 @@ CLAUDE.md            Claude Code 작업 규칙
 
 ## 라이선스
 
-LUMIQ는 [GNU General Public License v3.0](LICENSE)(GPL-3.0)으로 배포됩니다.
+DeskRaw는 [GNU General Public License v3.0](LICENSE)(GPL-3.0)으로 배포됩니다.
 외부 라이브러리와 모델 가중치는 각자의 라이선스를 따릅니다.
