@@ -10,6 +10,7 @@ __pycache__/
 .app_state.json
 settings.json
 previews/
+deskraw
 lumiq
 
 # 모델 가중치 (받는 주소는 requirements.txt)
@@ -22,6 +23,7 @@ models/
 .env.*
 
 # 사진 폴더에 생기는 파일 (혹시 프로젝트 안에서 작업한 경우)
+*.deskraw.json
 *.lumiq.json
 export/
 *.NEF

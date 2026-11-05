@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""LUMIQ Studio CLI: 니콘 Z6 NEF(및 JPG/HEIC/PNG/WebP/TIFF) 보정 스크립트.
+"""DeskRaw CLI: 니콘 Z6 NEF(및 JPG/HEIC/PNG/WebP/TIFF) 보정 스크립트.
 
   python main.py ~/Photos/0901 --preset portrait --size 2048
   python main.py DSC_1234.NEF --exposure +0.3 --wb 5200
   python main.py ~/Photos/0901 --xmp ~/presets/film.xmp --auto --ai-denoise
 
-Claude Code 연동 (보정값은 사진 옆 <사진 파일 이름>.lumiq.json, 예: DSC_1236.NEF.lumiq.json — 자동으로 적용):
+Claude Code 연동 (보정값은 사진 옆 <사진 파일 이름>.deskraw.json, 예: DSC_1236.NEF.deskraw.json — 자동으로 적용):
   python main.py ~/Photos/0901 --info                          # 사진 정보 JSON
   python main.py ~/Photos/0901/DSC_1236.NEF --preview          # 1024px 미리보기 → previews/
   python main.py ~/Photos/0901 --size 2048 --out ~/Photos/0901/export
@@ -44,7 +44,7 @@ def parse_args(argv=None):
     g = ap.add_argument_group("연동")
     g.add_argument("--info", action="store_true", help="EXIF·WB·히스토그램·얼굴·자동 보정 제안을 JSON으로 출력")
     g.add_argument("--preview", action="store_true", help=f"긴 변 1024px 미리보기를 {PREVIEW_DIR.name}/에 저장")
-    g.add_argument("--params", help="보정값 JSON/YAML 파일 또는 폴더. 생략하면 사진 옆 <사진 파일 이름>.lumiq.json")
+    g.add_argument("--params", help="보정값 JSON/YAML 파일 또는 폴더. 생략하면 사진 옆 <사진 파일 이름>.deskraw.json")
     g.add_argument("--only", help="일괄 처리 중 일부만: DSC_1236,DSC_1240")
     g.add_argument("--verbose", action="store_true", help="--info를 여러 장일 때도 전체 항목으로 출력")
     g = ap.add_argument_group("프리셋·자동")
@@ -122,8 +122,8 @@ def cli_layer(a) -> dict:
 
 
 class ParamsSource:
-    """보정값 출처. 기본은 사진 옆 <사진 파일 이름>.lumiq.json.
-    --params: 파일(dict 또는 list, .lumiq.json이면 그 사진) 또는 폴더(<사진 파일 이름>.lumiq.json / 예전 <stem>.json·.yaml)."""
+    """보정값 출처. 기본은 사진 옆 <사진 파일 이름>.deskraw.json.
+    --params: 파일(dict 또는 list, .deskraw.json이면 그 사진) 또는 폴더(<사진 파일 이름>.deskraw.json / 예전 <stem>.json·.yaml)."""
 
     def __init__(self, spec: str | None):
         self.dir = None
@@ -151,6 +151,8 @@ class ParamsSource:
             return files_mod.load_edit(path)
         if self.dir:
             f = self.dir / (path.name + files_mod.SIDECAR)
+            if not f.exists():
+                f = self.dir / (path.name + files_mod.OLD_SIDECAR)
             if not f.exists():
                 f = files_mod.find_legacy_edit(path, self.dir)  # 예전 방식: file 경로가 같은 것 우선, 없으면 이름으로
             if f:
@@ -186,7 +188,7 @@ class ParamsSource:
                     found.append(cand.absolute())
                     break
             else:
-                sys.exit(f"사진을 찾을 수 없음: {f} (보정값 파일은 사진 옆에 <사진 파일 이름>.lumiq.json으로 두세요)")
+                sys.exit(f"사진을 찾을 수 없음: {f} (보정값 파일은 사진 옆에 <사진 파일 이름>.deskraw.json으로 두세요)")
         return found
 
 

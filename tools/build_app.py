@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-"""'LUMIQ Studio.app' 만들기: 앱 하나만으로 실행되는 독립 번들.
+"""'DeskRaw.app' 만들기: 앱 하나만으로 실행되는 독립 번들.
 
 번들 안에 Python(python-build-standalone), .venv의 패키지, 코드, 기본 프리셋·LUT·모델, exiftool을 모두 넣는다.
 그래서 프로젝트 폴더·.venv·Homebrew가 없어도 앱이 실행된다. 작업 데이터(previews/·.app_state.json·
 저장한 프리셋)는 이 프로젝트 폴더를 그대로 쓴다 (폴더가 없으면 앱이 만든다).
 
-  .venv/bin/python tools/build_app.py            # /Applications에 LUMIQ Studio.app 설치·등록
+  .venv/bin/python tools/build_app.py            # /Applications에 DeskRaw.app 설치·등록
   .venv/bin/python tools/build_app.py ~/Applications
 
 앱은 설치할 때의 코드 사본이다. 코드를 고친 뒤 앱에 반영하려면 다시 실행한다
 (개발 중에는 .venv/bin/python app.py로 소스를 바로 실행). 패키지를 바꿨으면 .venv에 먼저 설치하고 다시 실행.
 
 번들 구조 (Contents/):
-  MacOS/LUMIQ Studio   앱 런처 (zsh)          MacOS/lumiq     CLI 런처 = main.py (작업 폴더의 ./lumiq 링크가 가리킴)
-  MacOS/lumiq-python   앱 안 Python 실행 파일 사본 (Dock·메뉴 막대에 앱 이름과 아이콘이 나오도록)
+  MacOS/DeskRaw   앱 런처 (zsh)          MacOS/deskraw     CLI 런처 = main.py (작업 폴더의 ./deskraw 링크가 가리킴)
+  MacOS/deskraw-python   앱 안 Python 실행 파일 사본 (Dock·메뉴 막대에 앱 이름과 아이콘이 나오도록)
   Resources/python/    독립형 Python 3.12 + site-packages
   Resources/app/       app.py main.py gui pipeline ai presets luts models CLAUDE.md
   Resources/exiftool/  exiftool (macOS 기본 perl로 실행)
@@ -35,8 +35,8 @@ from urllib.parse import quote
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-NAME = "LUMIQ Studio"
-BUNDLE_ID = "local.lumiq.studio"
+NAME = "DeskRaw"
+BUNDLE_ID = "local.deskraw.app"
 # Finder의 "다음으로 열기"에 나오도록 등록하는 형식 (보기 역할)
 IMAGE_UTIS = ["public.jpeg", "public.heic", "public.heif", "public.png", "org.webmproject.webp", "public.tiff",
               "public.camera-raw-image", "com.nikon.raw-image", "com.adobe.raw-image"]
@@ -185,10 +185,10 @@ def install_exiftool(dst: Path) -> bool:
 # ---------------------------------------------------------------- 런처·아이콘·plist
 LAUNCHER_HEAD = """#!/bin/zsh
 # {name}: 앱 안의 Python으로 앱 안의 코드를 실행한다 (프로젝트 폴더·.venv·Homebrew 없이 동작). tools/build_app.py가 만듦
-HERE="${{0:A:h}}"                  # 링크(작업 폴더의 ./lumiq)로 불러도 번들 안의 실제 위치
+HERE="${{0:A:h}}"                  # 링크(작업 폴더의 ./deskraw)로 불러도 번들 안의 실제 위치
 RES="${{HERE:h}}/Resources"
-export LUMIQ_BUNDLE="${{HERE:h:h}}"
-export LUMIQ_DATA="${{LUMIQ_DATA:-{data}}}"   # 작업 데이터 (previews/·.app_state.json)
+export DESKRAW_BUNDLE="${{HERE:h:h}}"
+export DESKRAW_DATA="${{DESKRAW_DATA:-{data}}}"   # 작업 데이터 (previews/·.app_state.json)
 export PATH="$RES/exiftool:$PATH"
 unset PYTHONPATH
 """
@@ -197,7 +197,7 @@ unset PYTHONPATH
 # 묻는 폴더에 있을 때, zsh와 앱 안 Python이 번갈아 접근하면 macOS가 같은 앱으로 기억하지 못해 실행할 때마다 다시 묻는다
 APP_LAUNCHER = LAUNCHER_HEAD + """LOG="$HOME/Library/Logs/{name}.log"
 export PYTHONHOME="$RES/python"     # MacOS/의 사본이 Resources/python의 표준 라이브러리를 찾도록 (app.py가 바로 지움)
-exec "$HERE/lumiq-python" -s -B "$RES/app/app.py" "$@" >>"$LOG" 2>&1
+exec "$HERE/deskraw-python" -s -B "$RES/app/app.py" "$@" >>"$LOG" 2>&1
 """
 
 CLI_LAUNCHER = LAUNCHER_HEAD + """exec "$RES/python/bin/python3.12" -E -s -B "$RES/app/main.py" "$@"
@@ -224,8 +224,8 @@ def write_plist(path: Path):
         "CFBundleName": NAME,
         "CFBundleDisplayName": NAME,
         "CFBundleIdentifier": BUNDLE_ID,
-        "CFBundleVersion": "1.0",
-        "CFBundleShortVersionString": "1.0",
+        "CFBundleVersion": "1.1",
+        "CFBundleShortVersionString": "1.1",
         "CFBundleExecutable": NAME,
         "CFBundleIconFile": "AppIcon",
         "CFBundlePackageType": "APPL",
@@ -246,22 +246,22 @@ def self_test(app: Path):
     """프로젝트·.venv·Homebrew를 쓰지 않는 환경(PATH 최소, 빈 작업 폴더)에서 번들만으로 돌아가는지 확인."""
     macos = app / "Contents" / "MacOS"
     with tempfile.TemporaryDirectory() as tmp:
-        env = {"HOME": str(Path.home()), "PATH": "/usr/bin:/bin:/usr/sbin:/sbin", "LUMIQ_DATA": tmp,
+        env = {"HOME": str(Path.home()), "PATH": "/usr/bin:/bin:/usr/sbin:/sbin", "DESKRAW_DATA": tmp,
                "QT_QPA_PLATFORM": "offscreen"}
-        r = subprocess.run([str(macos / "lumiq"), "--help"], capture_output=True, text=True, env=env, cwd="/")
+        r = subprocess.run([str(macos / "deskraw"), "--help"], capture_output=True, text=True, env=env, cwd="/")
         if r.returncode != 0:
             sys.exit(f"자체 점검 실패 (CLI):\n{r.stderr[-2000:]}")
         code = ("import os, sys, shutil, torch, cv2, rawpy, lensfunpy, pillow_heif, mediapipe;"
                 "from PySide6.QtWidgets import QApplication; a = QApplication([]);"
-                "sys.path.insert(0, os.environ['LUMIQ_BUNDLE'] + '/Contents/Resources/app');"
+                "sys.path.insert(0, os.environ['DESKRAW_BUNDLE'] + '/Contents/Resources/app');"
                 "from pipeline.params import DATA, ROOT; import gui.window;"
-                "assert str(DATA) == os.environ['LUMIQ_DATA'], DATA;"
+                "assert str(DATA) == os.environ['DESKRAW_DATA'], DATA;"
                 "print(ROOT, '|', shutil.which('exiftool'), '|', torch.backends.mps.is_available())")
         # 앱 런처가 주는 환경 그대로 (app.py가 하는 것처럼 PYTHONHOME은 시작 직후 지움)
         res = app / "Contents" / "Resources"
-        env |= {"PYTHONHOME": str(res / "python"), "LUMIQ_BUNDLE": str(app),
+        env |= {"PYTHONHOME": str(res / "python"), "DESKRAW_BUNDLE": str(app),
                 "PATH": f"{res / 'exiftool'}:{env['PATH']}"}
-        r = subprocess.run([str(macos / "lumiq-python"), "-s", "-B", "-c",
+        r = subprocess.run([str(macos / "deskraw-python"), "-s", "-B", "-c",
                             "import os; os.environ.pop('PYTHONHOME'); " + code],
                            capture_output=True, text=True, env=env, cwd="/")
         if r.returncode != 0:
@@ -294,8 +294,8 @@ def main():
         log("3/5 코드·프리셋·LUT·모델·exiftool")
         copy_app(res / "app")
         install_exiftool(res / "exiftool")
-        shutil.copy2(py / "bin" / "python3.12", macos / "lumiq-python")
-        for path, text in ((macos / NAME, APP_LAUNCHER), (macos / "lumiq", CLI_LAUNCHER)):
+        shutil.copy2(py / "bin" / "python3.12", macos / "deskraw-python")
+        for path, text in ((macos / NAME, APP_LAUNCHER), (macos / "deskraw", CLI_LAUNCHER)):
             path.write_text(text.format(name=NAME, data=ROOT), encoding="utf-8")
             os.chmod(path, 0o755)
         build_icns(res / "AppIcon.icns")

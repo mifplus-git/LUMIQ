@@ -1,6 +1,6 @@
 """위치(GPS) 추가: 좌표 읽기와 입력 창.
 
-원본 파일은 바꾸지 않는다. 위치는 사진 옆 보정값 파일(.lumiq.json)의 "gps"({"lat", "lon", "name"})에 저장되고
+원본 파일은 바꾸지 않는다. 위치는 사진 옆 보정값 파일(.deskraw.json)의 "gps"({"lat", "lon", "name"})에 저장되고
 내보낼 때 JPEG의 EXIF GPS로 기록된다 (pipeline/export.write_gps).
 """
 from __future__ import annotations

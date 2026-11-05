@@ -24,8 +24,8 @@ RADIUS = 8
 
 
 def wordmark(text: str) -> str:
-    """브랜드 표기: LUMIQ의 Q(Quality, 품질과 완성도)만 강조색으로. QLabel 리치 텍스트용."""
-    return text.replace("LUMIQ", f'LUMI<span style="color:{ACCENT_HI};">Q</span>', 1)
+    """브랜드 표기: DeskRaw의 Raw만 강조색으로. QLabel 리치 텍스트용."""
+    return text.replace("DeskRaw", f'Desk<span style="color:{ACCENT_HI};">Raw</span>', 1)
 
 
 def qc(hex_or_color, alpha: int | None = None) -> QColor:

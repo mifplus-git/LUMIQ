@@ -41,7 +41,7 @@ def run_cli(args, env) -> subprocess.CompletedProcess:
 
 
 def main(strict: bool = False) -> int:
-    print(f"LUMIQ 설치 확인 · Python {sys.version.split()[0]} · {sys.platform}")
+    print(f"DeskRaw 설치 확인 · Python {sys.version.split()[0]} · {sys.platform}")
     ok = True
 
     def optional(good: bool, text: str):
@@ -64,7 +64,7 @@ def main(strict: bool = False) -> int:
         have = (ROOT / "models" / name).exists()
         optional(have, f"models/{name}" + ("" if have else " 없음 (OpenCV 방식으로 대체)"))
 
-    tmp = Path(tempfile.mkdtemp(prefix="lumiq_check_"))
+    tmp = Path(tempfile.mkdtemp(prefix="deskraw_check_"))
     try:
         photos = tmp / "사진 폴더"
         photos.mkdir()
@@ -73,7 +73,7 @@ def main(strict: bool = False) -> int:
         y, x = np.mgrid[0:600, 0:900]
         img = np.stack([x / 900 * 200 + 30, y / 600 * 180 + 40, (x + y) / 1500 * 150 + 60], -1).astype("uint8")
         Image.fromarray(img).save(photos / PHOTO, quality=90)
-        env = {**os.environ, "LUMIQ_DATA": str(tmp / "data")}
+        env = {**os.environ, "DESKRAW_DATA": str(tmp / "data")}
 
         print("CLI")
         r = run_cli([str(photos / PHOTO), "--info"], env)
@@ -123,7 +123,7 @@ def gui_check(folder: str) -> int:
     from gui import window as W
     from gui.help import AboutDialog, HelpDialog
 
-    st = QSettings("lumiq", W.APP_NAME)
+    st = QSettings("deskraw", W.APP_NAME)
     saved = {k: st.value(k) for k in st.allKeys()}
     state = {"ok": False, "waited": 0}
     try:
@@ -167,7 +167,7 @@ def gui_check(folder: str) -> int:
         QTimer.singleShot(250, opened)
         app.exec()
     finally:
-        st2 = QSettings("lumiq", W.APP_NAME)
+        st2 = QSettings("deskraw", W.APP_NAME)
         st2.clear()
         for k, v in saved.items():
             st2.setValue(k, v)

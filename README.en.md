@@ -1,18 +1,20 @@
-# LUMIQ Studio
+<img src="gui/assets/icon-256.png" alt="" width="96">
+
+# DeskRaw
+
+> Formerly LUMIQ Studio. The repository address is unchanged; only the name and icon were updated to match the Desk series.
+> Existing edit files (`.lumiq.json`) are renamed automatically when you open a photo folder, and recent folders and window size carry over.
 
 [한국어](README.md) · **English**
 
 > **Understand the Light. Perfect the Image.**  
 > 빛을 이해하고, 사진을 완성하다.
 
-LUMIQ is an intelligent photo editing brand that uses AI to analyze the light, color, exposure and detail of a photo
+DeskRaw is an intelligent photo editing tool that uses AI to analyze the light, color, exposure and detail of a photo
 and raise its quality and finish. It lets anyone finish a photo quickly and easily, while keeping the freedom to refine it
 by hand to their own taste and style.
 
-- **LUMI**: the beauty of light and image (brightness, color, mood)
-- **Q**: Quality, the quality and finish of a photo
-
-**LUMIQ Studio** is a photo editor that develops Nikon Z6 RAW (NEF) files, as well as JPG, HEIC, PNG, WebP and TIFF, and exports them as JPEG.
+**DeskRaw** is a photo editor that develops Nikon Z6 RAW (NEF) files, as well as JPG, HEIC, PNG, WebP and TIFF, and exports them as JPEG.
 It comes as a desktop app and a command-line tool (CLI), and runs on Apple Silicon (M-series) Macs and Windows.
 
 All image processing runs locally on your computer. Paired with [Claude Code](https://claude.com/claude-code), Claude can analyze
@@ -36,14 +38,14 @@ a photo, choose the adjustments, and refine them through conversation. The code 
 - **12 LUTs**: film, cinematic teal & orange, golden hour, pastel bloom, mono film, and more
 - **Geometry**: lens correction (lensfun), auto leveling, crop (3:2, 4:5, 1:1, 16:9, free), rotate and flip
 - **Organizing**: star ratings, rating filter, add a location (GPS), original EXIF preserved
-- **Originals are never modified.** Adjustments are stored next to each photo in `<photo file name>.lumiq.json`
+- **Originals are never modified.** Adjustments are stored next to each photo in `<photo file name>.deskraw.json`
 
 ## Supported platforms
 
 | | Mac (Apple Silicon, M-series) | Windows 10/11 (64-bit) |
 | --- | --- | --- |
 | App and CLI | ✅ | ✅ |
-| Standalone app build | ✅ `LUMIQ Studio.app` | — (run from source, start from a shortcut) |
+| Standalone app build | ✅ `DeskRaw.app` | — (run from source, start from a shortcut) |
 | AI denoise | GPU (MPS) | CPU (slow) |
 | Show file location | Finder | File Explorer |
 
@@ -58,14 +60,14 @@ a photo, choose the adjustments, and refine them through conversation. The code 
 
 ```bash
 brew install python@3.12 exiftool
-git clone https://github.com/mifplus-git/LUMIQ.git
-cd LUMIQ
+git clone https://github.com/mifplus-git/LUMIQ.git DeskRaw
+cd DeskRaw
 /opt/homebrew/bin/python3.12 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 .venv/bin/python app.py
 ```
 
-**Standalone app**: builds `LUMIQ Studio.app` with Python, packages, code, models and exiftool bundled inside,
+**Standalone app**: builds `DeskRaw.app` with Python, packages, code, models and exiftool bundled inside,
 so it runs without this folder or Homebrew. Build it again after changing the code.
 Requires the Xcode Command Line Tools (`xcode-select --install`).
 
@@ -82,15 +84,15 @@ Run in PowerShell:
 winget install Python.Python.3.12
 winget install OliverBetz.ExifTool
 # open a new PowerShell window so the updated PATH takes effect
-git clone https://github.com/mifplus-git/LUMIQ.git
-cd LUMIQ
+git clone https://github.com/mifplus-git/LUMIQ.git DeskRaw
+cd DeskRaw
 py -3.12 -m venv .venv
 .venv\Scripts\pip install -r requirements.txt
 .venv\Scripts\python app.py
 ```
 
 - To start without a console window, use `.venv\Scripts\pythonw app.py`.
-- Desktop shortcut: set the target to `<LUMIQ folder>\.venv\Scripts\pythonw.exe app.py` and "Start in" to `<LUMIQ folder>`.
+- Desktop shortcut: set the target to `<DeskRaw folder>\.venv\Scripts\pythonw.exe app.py` and "Start in" to `<DeskRaw folder>`. For the icon, choose `gui\assets\icon.ico`.
 - In the examples below, `.venv/bin/python` is `.venv\Scripts\python` on Windows.
 
 ### Model weights (Mac and Windows)
@@ -169,7 +171,7 @@ Existing files are never overwritten; `_1`, `_2` is appended instead. Run `--hel
 
 ## Adjustment files
 
-Each photo gets a `<photo file name>.lumiq.json` next to it (e.g. `DSC_1236.NEF` → `DSC_1236.NEF.lumiq.json`).
+Each photo gets a `<photo file name>.deskraw.json` next to it (e.g. `DSC_1236.NEF` → `DSC_1236.NEF.deskraw.json`).
 The app, the CLI and Claude Code all share this file, so a change made in one shows up in the others right away.
 
 ```json
@@ -185,18 +187,18 @@ The app, the CLI and Claude Code all share this file, so a change made in one sh
 }
 ```
 
-Precedence (later wins): auto adjust < preset/xmp < per-photo yaml < `.lumiq.json` < CLI options.
+Precedence (later wins): auto adjust < preset/xmp < per-photo yaml < `.deskraw.json` < CLI options.
 Value ranges for every field are listed in [CLAUDE.md](CLAUDE.md).
 
 ## Using with Claude Code
 
 - Open Claude Code in this folder and it follows the rules in [CLAUDE.md](CLAUDE.md):
-  check the photo with `--info` → write `.lumiq.json` → render a `--preview` → review and refine → export.
+  check the photo with `--info` → write `.deskraw.json` → render a `--preview` → review and refine → export.
   For example: "DSC_1236 is a bit dark and the skin looks dull", "Apply the portrait preset to the 0901 folder".
 - The app's **AI assistant** (⌘K / Ctrl+K) runs the `claude` installed on your computer as `claude -p`.
   - It uses whatever Claude Code login already exists on that computer, so no API key is needed, and no account
     information is stored in the app or the repository.
-  - The only tools it may use are reading, editing and writing files, and running the LUMIQ CLI.
+  - The only tools it may use are reading, editing and writing files, and running the DeskRaw CLI.
 
 ## Project layout
 
@@ -222,5 +224,5 @@ CLAUDE.md            Working rules for Claude Code
 
 ## License
 
-LUMIQ is licensed under the [GNU General Public License v3.0](LICENSE) (GPL-3.0).
+DeskRaw is licensed under the [GNU General Public License v3.0](LICENSE) (GPL-3.0).
 Third-party libraries and model weights are subject to their own licenses.

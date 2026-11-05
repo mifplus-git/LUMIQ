@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""LUMIQ Studio 앱 실행 — 빛을 이해하고, 사진을 완성하다.
+"""DeskRaw 앱 실행 — 빛을 이해하고, 사진을 완성하다.
 
   .venv/bin/python app.py              # 마지막에 연 폴더로 시작
   .venv/bin/python app.py ~/Photos/0901
@@ -13,11 +13,11 @@ os.environ.setdefault("GLOG_minloglevel", "2")
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
 # 앱 번들 런처가 앱 안 Python에만 준 값. 자식 프로세스(claude 등)로 넘기지 않는다
 os.environ.pop("PYTHONHOME", None)
-if os.environ.get("LUMIQ_BUNDLE") and os.environ.get("LUMIQ_DATA"):
-    # 앱 번들: 작업 데이터 폴더에서 실행 (AI 패널의 claude와 ./lumiq가 이 폴더를 쓴다).
+if os.environ.get("DESKRAW_BUNDLE") and os.environ.get("DESKRAW_DATA"):
+    # 앱 번들: 작업 데이터 폴더에서 실행 (AI 패널의 claude와 ./deskraw가 이 폴더를 쓴다).
     # 런처가 아니라 여기서 해야 macOS 폴더 접근 허용이 한 번으로 기억된다 (tools/build_app.py 참고)
-    os.makedirs(os.environ["LUMIQ_DATA"], exist_ok=True)
-    os.chdir(os.environ["LUMIQ_DATA"])
+    os.makedirs(os.environ["DESKRAW_DATA"], exist_ok=True)
+    os.chdir(os.environ["DESKRAW_DATA"])
 
 
 def _set_mac_app_name(name: str):
@@ -69,7 +69,7 @@ def main():
     app = App(sys.argv)
     app.setApplicationName(APP_NAME)
     app.setApplicationDisplayName(APP_NAME)
-    app.setOrganizationName("lumiq")
+    app.setOrganizationName("deskraw")
     app.setStyle("Fusion")
     _dark_palette(app)
 
